@@ -1,0 +1,204 @@
+@import "tailwindcss";
+
+:root {
+  --background: #ffffff;
+  --foreground: #171717;
+}
+
+@theme inline {
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --font-sans: var(--font-geist-sans);
+  --font-mono: var(--font-geist-mono);
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --background: #0a0a0a;
+    --foreground: #ededed;
+  }
+}
+
+html, body {
+  min-height: 100%;
+  overscroll-behavior-y: none;
+  background: var(--background);
+  color: var(--foreground);
+  font-family: Arial, Helvetica, sans-serif;
+}
+
+/* รองรับ Safe Area สำหรับ iPhone / iPad (ติ่งกล้อง & แถบขีดด้านล่าง Home Indicator) */
+.pb-safe {
+  padding-bottom: max(0.5rem, env(safe-area-inset-bottom, 0.5rem));
+}
+.pt-safe {
+  padding-top: max(0.5rem, env(safe-area-inset-top, 0.5rem));
+}
+
+/* ========================================================
+   Responsive Device Mode System:
+   - "Mobile Mode": มือถือทุกรุ่น + iPad ทุกรุ่นในแนวตั้ง (Portrait)
+   - "Desktop Mode": คอมพิวเตอร์ PC/Mac + iPad ในแนวนอน (Landscape >= 1024px)
+   ======================================================== */
+
+/* 1. ค่าเริ่มต้น: แสดงแบบ Mobile Mode (มือถือ + iPad แนวตั้ง) */
+.desktop-only,
+.desktop-flex,
+.desktop-block,
+.desktop-grid {
+  display: none !important;
+}
+
+.mobile-only,
+.mobile-flex {
+  display: flex !important;
+}
+
+.mobile-block {
+  display: block !important;
+}
+
+.page-bottom-padding {
+  padding-bottom: max(5.25rem, env(safe-area-inset-bottom, 5.25rem)) !important;
+}
+
+/* คอลัมน์การ์ดปัด: ฟิตพอดี 100% ของความสูงหน้าจอ ไม่ดันล้น ไม่เลื่อน */
+.swipe-card-box {
+  height: 100%;
+  max-height: 100%;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 1;
+}
+
+.swipe-card-aspect {
+  flex: 1 1 0%;
+  min-height: 0;
+  aspect-ratio: 3 / 4;
+  max-height: min(480px, calc(100% - 68px));
+  max-width: min(360px, 85vw);
+  width: auto;
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+@media (min-width: 768px) and (orientation: portrait) {
+  .swipe-card-aspect {
+    max-height: min(560px, calc(100% - 72px));
+    max-width: min(450px, 88vw);
+  }
+}
+
+/* 2. Media Query สำหรับโหมด Desktop: iPad แนวนอน (กว้าง >= 1024px ใน Landscape) หรือ จอคอมพิวเตอร์ใหญ่ (กว้าง >= 1360px) */
+@media screen and (min-width: 1024px) and (orientation: landscape), screen and (min-width: 1360px) {
+  .desktop-only,
+  .desktop-flex {
+    display: flex !important;
+  }
+
+  .desktop-block {
+    display: block !important;
+  }
+
+  .desktop-grid {
+    display: grid !important;
+  }
+
+  .mobile-only,
+  .mobile-flex,
+  .mobile-block {
+    display: none !important;
+  }
+
+  .page-bottom-padding {
+    padding-bottom: 1.5rem !important;
+  }
+
+  .desktop-border {
+    border-width: 1px !important;
+    border-color: #f3e8ff !important;
+  }
+
+  .desktop-rounded-3xl {
+    border-radius: 1.5rem !important;
+  }
+
+  .desktop-shadow-xl {
+    box-shadow: 0 20px 25px -5px rgb(0 0 0 / 0.1), 0 8px 10px -6px rgb(0 0 0 / 0.1) !important;
+  }
+
+  .desktop-card-pad {
+    padding: 0.5rem 1rem 0.75rem 1rem !important;
+  }
+}
+
+/* 3. Class-based Enforcers (ควบคุมผ่าน JavaScript ใน layout.tsx ทำงานแม่นยำ 100% แม้ใน DevTools / หมุนหน้าจอ) */
+html.device-desktop .desktop-only,
+html.device-desktop .desktop-flex {
+  display: flex !important;
+}
+html.device-desktop .desktop-block {
+  display: block !important;
+}
+html.device-desktop .desktop-grid {
+  display: grid !important;
+}
+html.device-desktop .mobile-only,
+html.device-desktop .mobile-flex,
+html.device-desktop .mobile-block {
+  display: none !important;
+}
+html.device-desktop .page-bottom-padding {
+  padding-bottom: 0.75rem !important;
+}
+html.device-desktop .desktop-border {
+  border-width: 1px !important;
+  border-color: #f3e8ff !important;
+}
+html.device-desktop .desktop-rounded-3xl {
+  border-radius: 1.5rem !important;
+}
+html.device-desktop .desktop-shadow-xl {
+  box-shadow: 0 20px 25px -5px rgb(0 0 0 / 0.1), 0 8px 10px -6px rgb(0 0 0 / 0.1) !important;
+}
+html.device-desktop .desktop-card-pad {
+  padding: 0.5rem 1rem 0.75rem 1rem !important;
+}
+html.device-desktop .swipe-card-aspect {
+  max-height: min(480px, calc(100% - 68px)) !important;
+  max-width: min(360px, 85vw) !important;
+}
+
+html.device-mobile .desktop-only,
+html.device-mobile .desktop-flex,
+html.device-mobile .desktop-block,
+html.device-mobile .desktop-grid {
+  display: none !important;
+}
+html.device-mobile .mobile-only,
+html.device-mobile .mobile-flex {
+  display: flex !important;
+}
+html.device-mobile .mobile-block {
+  display: block !important;
+}
+html.device-mobile .page-bottom-padding {
+  padding-bottom: max(5.25rem, env(safe-area-inset-bottom, 5.25rem)) !important;
+}
+html.device-mobile .swipe-card-aspect {
+  max-height: min(560px, calc(100% - 72px)) !important;
+  max-width: min(450px, 88vw) !important;
+}
+@media (max-width: 639px) {
+  html.device-mobile .swipe-card-aspect {
+    max-height: min(460px, calc(100% - 68px)) !important;
+    max-width: min(330px, 88vw) !important;
+  }
+}
+
+

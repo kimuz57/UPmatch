@@ -1,0 +1,45 @@
+# Dependencies
+node_modules/
+frontend/node_modules/
+
+# Next.js build
+.next/
+frontend/.next/
+out/
+frontend/out/
+build/
+frontend/build/
+
+# Go binaries & temporary build files
+*.exe
+backend/upmatch-backend.exe
+backend/tmp/
+tmp/
+*.test
+*.prof
+
+# Sensitive tokens & credentials
+credentials.json
+backend/credentials.json
+token.json
+backend/token.json
+
+# Environment variables
+.env
+backend/.env
+.env.local
+.env.*.local
+
+# OS & debug logs
+.DS_Store
+Thumbs.db
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# IDE & Editor
+.vscode/
+.idea/
+*.swp
+*.swo
