@@ -18,6 +18,12 @@ tmp/
 *.test
 *.prof
 
+# User uploaded media
+backend/uploads/*
+!backend/uploads/.gitkeep
+uploads/*
+!uploads/.gitkeep
+
 # Sensitive tokens & credentials
 credentials.json
 backend/credentials.json

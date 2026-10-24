@@ -1,0 +1,17 @@
+# Environment variables
+.env
+.env.*
+
+# Sensitive credentials
+credentials.json
+token.json
+
+# Go build & Air temporary files
+tmp/
+*.exe
+*.test
+*.prof
+
+# Uploads
+uploads/*
+!uploads/.gitkeep
