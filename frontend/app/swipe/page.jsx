@@ -343,7 +343,7 @@ export default function SwipePage() {
 
   if (loading) {
     return (
-      <div className="h-screen bg-gradient-to-br from-purple-50 via-white to-pink-50 flex flex-col items-center justify-center">
+      <div className="h-screen bg-transparent flex flex-col items-center justify-center">
         <Heart className="w-12 h-12 text-purple-400 animate-bounce fill-purple-400 mb-4" />
         <p className="text-purple-600 font-bold text-sm flex items-center gap-2">
           <Loader2 className="w-4 h-4 animate-spin" /> กำลังค้นหาเพื่อนชาว มพ...
@@ -353,8 +353,7 @@ export default function SwipePage() {
   }
 
   return (
-    <div className="h-dvh max-h-screen bg-gradient-to-br from-purple-50 via-white to-pink-50 text-slate-800 flex flex-col overflow-hidden relative page-bottom-padding">
-      <div className="absolute top-[-10%] left-[-10%] w-[500px] h-[500px] bg-purple-200/40 rounded-full blur-3xl pointer-events-none z-0" />
+    <div className="h-dvh max-h-screen bg-transparent text-slate-800 flex flex-col overflow-hidden relative page-bottom-padding">
       <div className="relative z-10 w-full shrink-0"><Navbar /></div>
 
       <main className="flex-1 min-h-0 max-w-4xl mx-auto w-full px-3 sm:px-4 py-1 sm:py-2 flex flex-col relative z-10 justify-center overflow-hidden">

@@ -6,7 +6,7 @@ export const instant = false;
 
 function ChatLoadingFallback() {
   return (
-    <div className="min-h-screen bg-gradient-to-br from-purple-50 via-white to-pink-50 text-slate-800 flex flex-col">
+    <div className="min-h-screen bg-transparent text-slate-800 flex flex-col">
       <header className="sticky top-0 z-30 bg-white/95 backdrop-blur-md border-b border-purple-100/80 shadow-xs h-18" />
       <main className="flex-1 max-w-2xl mx-auto w-full px-4 py-6 flex items-center justify-center">
         <div className="flex flex-col items-center gap-2 text-purple-600 font-bold text-sm">

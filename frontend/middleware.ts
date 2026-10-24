@@ -1,5 +1,5 @@
 // frontend/middleware.js (หรือ middleware.ts)
-import { NextResponse } from 'next/server';
+import { NextResponse, type NextRequest } from 'next/server';
 
 function getSessionSignature(tok: string): string {
   if (!tok) return "";
@@ -14,7 +14,7 @@ function getSessionSignature(tok: string): string {
   return `sid_${(h1 >>> 0).toString(16)}${(h2 >>> 0).toString(16)}`;
 }
 
-export function middleware(request) {
+export function middleware(request: NextRequest) {
   const path = request.nextUrl.pathname;
 
   // 1. กำหนดหน้าเว็บที่ "ต้องล็อกอิน" เท่านั้นถึงจะเข้าได้

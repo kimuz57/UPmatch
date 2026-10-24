@@ -14,20 +14,6 @@ import {
 } from "lucide-react";
 import AuthPage from "../components/AuthPage";
 
-const floatingHearts = [
-  { id: 1, left: "10%", size: 24, delay: 0, duration: 14 },
-  { id: 2, left: "25%", size: 16, delay: 2, duration: 18 },
-  { id: 3, left: "45%", size: 32, delay: 1, duration: 15 },
-  { id: 4, left: "65%", size: 20, delay: 4, duration: 20 },
-  { id: 5, left: "85%", size: 28, delay: 2.5, duration: 16 },
-  { id: 6, left: "15%", size: 18, delay: 5, duration: 17 },
-  { id: 7, left: "35%", size: 22, delay: 7, duration: 13 },
-  { id: 8, left: "55%", size: 26, delay: 3.5, duration: 19 },
-  { id: 9, left: "75%", size: 15, delay: 6, duration: 14 },
-  { id: 10, left: "90%", size: 30, delay: 1.5, duration: 18 },
-  { id: 11, left: "5%", size: 20, delay: 8, duration: 15 },
-  { id: 12, left: "50%", size: 14, delay: 0.5, duration: 12 },
-];
 
 export default function LandingPage() {
   const router = useRouter();
@@ -79,39 +65,8 @@ export default function LandingPage() {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-purple-50 via-white to-pink-50 text-slate-800 flex flex-col justify-between relative overflow-x-hidden">
-      {/* Background Animations: ฟองสบู่รูปหัวใจ & แสงสีเบลอ (จำกัดไม่ให้ล้นออกนอกจอ) */}
-      <div className="absolute inset-0 overflow-hidden pointer-events-none z-0">
-        {floatingHearts.map((heart) => (
-          <motion.div
-            key={heart.id}
-            className="absolute bottom-[-10%] text-pink-300/40"
-            style={{ left: heart.left }}
-            animate={{
-              y: ["0vh", "-120vh"],
-              x: ["0px", "20px", "-20px", "0px"],
-              rotate: [0, 30, -30, 0],
-              opacity: [0, 0.8, 0.8, 0],
-            }}
-            transition={{
-              duration: heart.duration,
-              repeat: Infinity,
-              delay: heart.delay,
-              ease: "linear",
-            }}
-          >
-            <Heart
-              width={heart.size}
-              height={heart.size}
-              fill="currentColor"
-              strokeWidth={1}
-            />
-          </motion.div>
-        ))}
+    <div className="min-h-screen bg-transparent text-slate-800 flex flex-col justify-between relative overflow-x-hidden">
 
-        <div className="absolute top-[-10%] left-[-10%] w-[500px] h-[500px] bg-purple-200/40 rounded-full blur-3xl" />
-        <div className="absolute bottom-[-10%] right-[-10%] w-[500px] h-[500px] bg-pink-200/30 rounded-full blur-3xl" />
-      </div>
 
       {/* Navbar ด้านบน */}
       <header className="w-full max-w-6xl mx-auto px-6 py-6 flex items-center justify-between relative z-10">

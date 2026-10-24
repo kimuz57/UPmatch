@@ -17,19 +17,6 @@ import {
 import { parseStudentEmail } from "../utils/emailParser";
 import { getApiBaseUrl } from "../utils/api";
 
-// ข้อมูลสำหรับแอนิเมชันฟองสบู่หัวใจ
-const floatingHearts = [
-  { id: 1, left: "10%", size: 24, delay: 0, duration: 14 },
-  { id: 2, left: "25%", size: 16, delay: 2, duration: 18 },
-  { id: 3, left: "45%", size: 32, delay: 1, duration: 15 },
-  { id: 4, left: "65%", size: 20, delay: 4, duration: 20 },
-  { id: 5, left: "85%", size: 28, delay: 2.5, duration: 16 },
-  { id: 6, left: "15%", size: 18, delay: 5, duration: 17 },
-  { id: 7, left: "35%", size: 22, delay: 7, duration: 13 },
-  { id: 8, left: "55%", size: 26, delay: 3.5, duration: 19 },
-  { id: 9, left: "75%", size: 15, delay: 6, duration: 14 },
-  { id: 10, left: "90%", size: 30, delay: 1.5, duration: 18 },
-];
 
 export default function AuthPage({ onLoginSuccess, onBack }) {
   const [step, setStep] = useState("email"); // 'email' | 'otp'
@@ -144,40 +131,8 @@ export default function AuthPage({ onLoginSuccess, onBack }) {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-purple-50 via-white to-pink-50 text-slate-800 flex items-center justify-center p-4 py-8 relative overflow-y-auto overflow-x-hidden">
-      {/* Background Animations: ฟองสบู่รูปหัวใจ & แสงสีเบลอ */}
-      <div className="absolute inset-0 overflow-hidden pointer-events-none z-0">
-        {floatingHearts.map((heart) => (
-          <motion.div
-            key={heart.id}
-            className="absolute bottom-[-10%] text-pink-300/40"
-            style={{ left: heart.left }}
-            animate={{
-              y: ["0vh", "-120vh"],
-              x: ["0px", "20px", "-20px", "0px"],
-              rotate: [0, 30, -30, 0],
-              opacity: [0, 0.8, 0.8, 0],
-            }}
-            transition={{
-              duration: heart.duration,
-              repeat: Infinity,
-              delay: heart.delay,
-              ease: "linear",
-            }}
-          >
-            <Heart
-              width={heart.size}
-              height={heart.size}
-              fill="currentColor"
-              strokeWidth={1}
-            />
-          </motion.div>
-        ))}
+    <div className="min-h-screen bg-transparent text-slate-800 flex items-center justify-center p-4 py-8 relative overflow-y-auto overflow-x-hidden">
 
-        {/* แสงตกแต่งพื้นหลังโทนพาสเทล */}
-        <div className="absolute -top-32 -left-32 w-96 h-96 bg-purple-200/50 rounded-full blur-3xl pointer-events-none" />
-        <div className="absolute -bottom-32 -right-32 w-96 h-96 bg-pink-200/40 rounded-full blur-3xl pointer-events-none" />
-      </div>
 
       {/* การ์ด Glassmorphism */}
       <div className="max-w-md w-full bg-white/85 sm:bg-white/70 backdrop-blur-xl border border-white/50 rounded-3xl p-5 sm:p-9 space-y-5 sm:space-y-6 shadow-xl shadow-purple-100 relative z-10">

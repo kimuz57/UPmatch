@@ -542,7 +542,7 @@ export default function ChatRoomClient({ targetEmail }) {
   const displayAge = getAge();
 
   return (
-    <div className="fixed inset-0 h-dvh max-h-screen bg-gradient-to-br from-purple-50 via-white to-pink-50 text-slate-800 flex flex-col overflow-hidden">
+    <div className="fixed inset-0 h-dvh max-h-screen bg-transparent text-slate-800 flex flex-col overflow-hidden">
       {/* 1. เก็บ Navbar เอาไว้ด้านบนแบบ stationary บน Desktop & iPad แนวนอน */}
       <div className="shrink-0 z-30 desktop-block">
         <Navbar />

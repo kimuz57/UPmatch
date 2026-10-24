@@ -7,20 +7,6 @@ import { motion } from "framer-motion";
 import { Heart, X, Image as ImageIcon, Loader2 } from "lucide-react";
 import { getApiBaseUrl } from "@/utils/api";
 
-const floatingHearts = [
-  { id: 1, left: "10%", size: 24, delay: 0, duration: 14 },
-  { id: 2, left: "25%", size: 16, delay: 2, duration: 18 },
-  { id: 3, left: "45%", size: 32, delay: 1, duration: 15 },
-  { id: 4, left: "65%", size: 20, delay: 4, duration: 20 },
-  { id: 5, left: "85%", size: 28, delay: 2.5, duration: 16 },
-  { id: 6, left: "15%", size: 18, delay: 5, duration: 17 },
-  { id: 7, left: "35%", size: 22, delay: 7, duration: 13 },
-  { id: 8, left: "55%", size: 26, delay: 3.5, duration: 19 },
-  { id: 9, left: "75%", size: 15, delay: 6, duration: 14 },
-  { id: 10, left: "90%", size: 30, delay: 1.5, duration: 18 },
-  { id: 11, left: "5%", size: 20, delay: 8, duration: 15 },
-  { id: 12, left: "50%", size: 14, delay: 0.5, duration: 12 },
-];
 
 interface FormDataState {
   name: string;
@@ -188,25 +174,8 @@ export default function OnboardingPage() {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-purple-50 via-white to-pink-50 text-slate-800 flex flex-col items-center justify-center relative overflow-y-auto overflow-x-hidden p-4 py-8">
-      <div className="absolute inset-0 overflow-hidden pointer-events-none z-0">
-        {floatingHearts.map((heart) => (
-          <motion.div
-            key={heart.id}
-            className="absolute bottom-[-10%] text-pink-300/40"
-            style={{ left: heart.left }}
-            animate={{
-              y: ["0vh", "-120vh"],
-              x: ["0px", "20px", "-20px", "0px"],
-              rotate: [0, 30, -30, 0],
-              opacity: [0, 0.8, 0.8, 0],
-            }}
-            transition={{ duration: heart.duration, repeat: Infinity, delay: heart.delay, ease: "linear" }}
-          >
-            <Heart width={heart.size} height={heart.size} fill="currentColor" strokeWidth={1} />
-          </motion.div>
-        ))}
-      </div>
+    <div className="min-h-screen bg-transparent text-slate-800 flex flex-col items-center justify-center relative overflow-y-auto overflow-x-hidden p-4 py-8">
+
 
       <div className="bg-white/80 border border-purple-50 p-8 rounded-3xl shadow-xl w-full max-w-md relative z-10 backdrop-blur-md">
         <h2 className="text-2xl font-extrabold text-slate-800 mb-6 text-center">

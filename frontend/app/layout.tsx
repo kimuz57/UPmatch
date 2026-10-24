@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
 import GlobalNotification from "@/components/GlobalNotification";
+import FloatingHeartsBackground from "@/components/FloatingHeartsBackground";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -68,7 +69,8 @@ export default function RootLayout({
           }}
         />
       </head>
-      <body className="min-h-full flex flex-col">
+      <body className="min-h-full flex flex-col bg-gradient-to-br from-purple-50 via-white to-pink-50 text-slate-800 relative selection:bg-purple-200">
+        <FloatingHeartsBackground />
         <GlobalNotification />
         {children}
       </body>
