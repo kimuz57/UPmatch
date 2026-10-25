@@ -22,7 +22,7 @@ func main() {
 	// เชื่อมต่อฐานข้อมูลและ Redis
 	config.ConnectRedis()
 	config.ConnectDatabase()
-	
+
 	// กำหนดและสร้างโฟลเดอร์ uploads ให้มีเส้นทางที่ชัดเจนและคงที่
 	config.InitUploadDir()
 
@@ -47,6 +47,6 @@ func main() {
 	routes.SetupRoutes(app)
 
 	// รันเซิร์ฟเวอร์
-	log.Println("🚀 Backend พร้อมทำงานที่ http://localhost:8080")
-	log.Fatal(app.Listen(":8080"))
+	log.Println("🚀 Backend พร้อมทำงานที่ http://localhost:8081")
+	log.Fatal(app.Listen(":8081"))
 }
