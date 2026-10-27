@@ -28,6 +28,16 @@ export default function LandingPage() {
       return "";
     };
 
+    // ดักจับ Referral Code จาก URL เช่น ?ref=REF_...
+    if (typeof window !== "undefined") {
+      const urlParams = new URLSearchParams(window.location.search);
+      const refParam = urlParams.get("ref");
+      if (refParam) {
+        sessionStorage.setItem("upmatch_referral_code", refParam);
+        localStorage.setItem("upmatch_referral_code", refParam);
+      }
+    }
+
     const token = getCookie("up_match_token");
     if (token) {
       router.push("/swipe");
@@ -64,38 +74,23 @@ export default function LandingPage() {
       {/* Top Header */}
       <header className="w-full max-w-6xl mx-auto px-6 py-5 flex items-center justify-between border-b border-slate-200/80 bg-white/85">
         <div className="flex items-center gap-3">
-          <div className="w-10 h-10 rounded-xl bg-purple-900 flex items-center justify-center text-white shadow-xs">
-            <HeartHandshake className="w-5 h-5" />
-          </div>
+          <img src="/logo.png" alt="UP Match" className="w-14 h-14" />
           <div>
             <span className="text-lg font-black tracking-tight text-slate-950">
               UP Match
             </span>
             <span className="block text-[11px] font-semibold text-purple-900">
-              มหาวิทยาลัยพะเยา
+              Just Match, The Right Person
             </span>
           </div>
         </div>
-
-        <button
-          onClick={() => setShowAuth(true)}
-          className="px-4 py-2 rounded-xl bg-purple-900 hover:bg-purple-950 text-white text-xs font-semibold transition cursor-pointer shadow-xs active:scale-[0.98]"
-        >
-          เข้าสู่ระบบ
-        </button>
       </header>
 
       {/* Main Content: Asymmetric Editorial Grid */}
       <main className="flex-1 max-w-6xl mx-auto px-6 py-12 md:py-16 w-full flex flex-col justify-center">
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-10 lg:gap-14 items-center">
-          
           {/* Left Column: Editorial Headline & Actions */}
           <div className="lg:col-span-7 text-left space-y-6">
-            <div className="inline-flex items-center gap-2 px-3 py-1 rounded-md bg-purple-100 text-purple-900 text-xs font-bold border border-purple-200">
-              <ShieldCheck className="w-4 h-4 text-purple-900 shrink-0" />
-              <span>ยืนยันตัวตนด้วยอีเมล @up.ac.th</span>
-            </div>
-
             <h1 className="text-4xl sm:text-5xl lg:text-6xl font-black tracking-tight text-slate-950 leading-[1.12]">
               พื้นที่ทำความรู้จักเพื่อนใหม่ ในรั้วมหาวิทยาลัยพะเยา
             </h1>
@@ -119,38 +114,7 @@ export default function LandingPage() {
 
           {/* Right Column: Campus Mock Card */}
           <div className="lg:col-span-5 flex justify-center">
-            <div className="w-full max-w-sm rounded-2xl bg-white border border-slate-200 shadow-sm p-5 space-y-4">
-              <div className="relative aspect-[4/5] rounded-xl overflow-hidden bg-slate-900">
-                <img
-                  src="/logo.png"
-                  alt="UP Match Community"
-                  className="w-full h-full object-cover p-8 bg-purple-950"
-                />
-                <div className="absolute inset-0 bg-gradient-to-t from-slate-950/90 via-slate-950/30 to-transparent" />
-                <div className="absolute bottom-4 left-4 right-4 text-white space-y-1">
-                  <div className="flex items-center gap-2">
-                    <span className="text-lg font-black">ฟ้าใส, 20</span>
-                    <span className="px-2 py-0.5 rounded-md bg-purple-900 text-white text-[10px] font-bold">
-                      ICT ม.พะเยา
-                    </span>
-                  </div>
-                  <p className="text-xs text-slate-200 line-clamp-2">
-                    หาเพื่อนกินหมูกระทะหน้ามอ และเพื่อนอ่านหนังสือหอสมุด
-                  </p>
-                </div>
-              </div>
-
-              <div className="grid grid-cols-2 gap-2 text-xs">
-                <div className="p-2.5 rounded-lg bg-slate-50 border border-slate-200">
-                  <span className="text-slate-500 block text-[10px] font-semibold">คณะ</span>
-                  <span className="font-bold text-slate-900">เทคโนโลยีสารสนเทศ</span>
-                </div>
-                <div className="p-2.5 rounded-lg bg-slate-50 border border-slate-200">
-                  <span className="text-slate-500 block text-[10px] font-semibold">ชั้นปี</span>
-                  <span className="font-bold text-slate-900">ปี 2 (รหัส 66)</span>
-                </div>
-              </div>
-            </div>
+            <img src="/jpg.jpg" alt="UP Match Community" />
           </div>
 
         </div>
@@ -173,7 +137,7 @@ export default function LandingPage() {
             </div>
             <h2 className="text-sm font-bold text-slate-900">คัดกรองตามคณะและชั้นปี</h2>
             <p className="text-xs text-slate-600 mt-1.5 leading-relaxed">
-              ทำความรู้จักเพื่อนจากคณะที่สนใจ หรือค้นหาเพื่อนสายรหัสและชั้นปีเดียวกัน
+              ทำความรู้จักเพื่อนจากคณะที่สนใจ หรือค้นหาเพื่อนสายรหัสและชั้นปีเดียวกัน (ยังทำไม่เสร็จ)
             </p>
           </div>
 

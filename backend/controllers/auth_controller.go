@@ -1,6 +1,7 @@
 package controllers
 
 import (
+	"crypto/md5"
 	"crypto/rand"
 	"encoding/hex"
 	"fmt"
@@ -14,6 +15,7 @@ import (
 	"github.com/redis/go-redis/v9"
 
 	"upmatch-backend/config" // นำเข้า config เพื่อใช้งาน RedisClient
+	"upmatch-backend/models"
 	"upmatch-backend/utils"
 )
 
@@ -23,8 +25,16 @@ type OTPRequest struct {
 }
 
 type VerifyRequest struct {
-	Email string `json:"email"`
-	OTP   string `json:"otp"`
+	Email        string `json:"email"`
+	OTP          string `json:"otp"`
+	ReferralCode string `json:"referral_code"` // รหัสชวนเพื่อน (ถ้ามี)
+}
+
+func generateReferralCode(email string) string {
+	b := make([]byte, 4)
+	_, _ = rand.Read(b)
+	hash := md5.Sum([]byte(email + time.Now().String()))
+	return fmt.Sprintf("REF_%s%s", hex.EncodeToString(b), hex.EncodeToString(hash[:2]))
 }
 
 func getSessionCookieName() string {
@@ -188,9 +198,53 @@ func VerifyOTP(c *fiber.Ctx) error {
 		SameSite: "Lax",
 	})
 
+	// 5. บันทึกหรือสร้าง User และประมวลผล Referral
+	var user models.User
+	if err := config.DB.Where("LOWER(email) = ?", cleanEmail).First(&user).Error; err != nil {
+		user = models.User{
+			Email:        cleanEmail,
+			Name:         strings.Split(cleanEmail, "@")[0],
+			AccountType:  "standard",
+			IsPro:        false,
+			ReferralCode: generateReferralCode(cleanEmail),
+		}
+		config.DB.Create(&user)
+	} else if user.ReferralCode == "" {
+		user.ReferralCode = generateReferralCode(cleanEmail)
+		config.DB.Save(&user)
+	}
+
+	// ตรวจสอบ Referral Code เมื่อเพื่อนกดสมัครผ่านลิงก์
+	cleanRef := strings.TrimSpace(req.ReferralCode)
+	if cleanRef != "" && user.ReferredBy == "" {
+		var referrer models.User
+		if err := config.DB.Where("LOWER(referral_code) = ?", strings.ToLower(cleanRef)).First(&referrer).Error; err == nil {
+			referrerEmail := strings.ToLower(strings.TrimSpace(referrer.Email))
+			// ป้องกันการชวนตัวเอง (Self-referral check)
+			if referrerEmail != cleanEmail {
+				user.ReferredBy = referrerEmail
+				config.DB.Save(&user)
+
+				// อัปเกรดผู้ชวนเป็น PRO ทันที!
+				if !referrer.IsPro {
+					referrer.IsPro = true
+					referrer.AccountType = "pro"
+					config.DB.Save(&referrer)
+					log.Printf("🎉 User %s upgraded to PRO via referral from %s\n", referrerEmail, cleanEmail)
+
+					// ส่งสัญญาณ Real-time SSE ไปยังเครื่องของผู้ชวนทันที!
+					Hub.BroadcastProUpgrade(referrerEmail)
+				}
+			}
+		}
+	}
+
 	return c.Status(200).JSON(fiber.Map{
-		"message": "ยืนยันตัวตนสำเร็จ!",
-		"email":   cleanEmail,
-		"token":   sessionToken,
+		"message":       "ยืนยันตัวตนสำเร็จ!",
+		"email":         cleanEmail,
+		"token":         sessionToken,
+		"is_pro":        user.IsPro,
+		"account_type":  user.AccountType,
+		"referral_code": user.ReferralCode,
 	})
 }

@@ -12,6 +12,12 @@ type User struct {
 	CreatedAt time.Time      `json:"created_at"`
 	DeletedAt gorm.DeletedAt `gorm:"index" json:"deleted_at"` // Soft delete
 	
+	// สถานะบัญชี และ Referral
+	IsPro        bool           `gorm:"default:false" json:"is_pro"`
+	AccountType  string         `gorm:"type:varchar(20);default:'standard'" json:"account_type"` // standard | pro
+	ReferralCode string         `gorm:"type:varchar(64);uniqueIndex" json:"referral_code"`
+	ReferredBy   string         `gorm:"type:varchar(100)" json:"referred_by"`
+	
 	// Relations
 	UserInfo  UserInfo       `gorm:"foreignKey:UserEmail;references:Email" json:"user_info"`
 	Images    []UserImage    `gorm:"foreignKey:UserEmail;references:Email" json:"images"` // เพิ่มรูปภาพ (1 คนมีได้หลายรูป)

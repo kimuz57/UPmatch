@@ -461,7 +461,7 @@ export default function ProfilePage() {
       <div className="shrink-0 z-30">
         <Navbar />
       </div>
-      <main className="flex-1 min-h-0 overflow-y-auto max-w-md mx-auto w-full px-4 py-4 sm:py-6 page-bottom-padding">
+      <main className="flex-1 min-h-0 overflow-y-auto no-scrollbar max-w-md mx-auto w-full px-4 py-4 sm:py-6 page-bottom-padding">
         {loading ? (
           <div className="flex flex-col items-center justify-center py-20">
             <Loader2 className="w-8 h-8 animate-spin text-purple-800 mb-2" />
@@ -699,7 +699,7 @@ export default function ProfilePage() {
                   disabled={saving}
                   className="w-1/2 py-2.5 rounded-xl bg-purple-900 hover:bg-purple-950 text-white font-bold shadow-xs flex items-center justify-center gap-1.5 cursor-pointer disabled:opacity-50"
                 >
-                  {saving ? <Loader2 className="w-4 h-4 animate-spin" /> : <Check className="w-4 h-4" />}
+                  {saving ? <Loader2 className="w-4 h-4 animate-spin" /> : <Save className="w-4 h-4" />}
                   บันทึกข้อมูล
                 </button>
               </div>

@@ -174,7 +174,7 @@ export default function OnboardingPage() {
     <div className="min-h-screen bg-transparent text-slate-800 flex flex-col items-center justify-center relative z-10 overflow-y-auto overflow-x-hidden p-4 py-8">
       <div className="bg-white border border-slate-200 p-6 sm:p-8 rounded-2xl shadow-sm w-full max-w-md relative z-10">
         <h1 className="text-xl sm:text-2xl font-black text-slate-950 mb-6 text-center">
-          ตั้งค่าโปรไฟล์ UPer
+          ตั้งค่าโปรไฟล์
           <span className="block text-xs font-bold text-purple-800 mt-1">ขั้นตอนที่ {step} จาก 4</span>
         </h1>
 

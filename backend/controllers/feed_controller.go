@@ -297,8 +297,11 @@ func GetMe(c *fiber.Ctx) error {
 			"hobbies":    prof.Hobbies,
 			"mbti":       prof.MBTI,
 			"image":      imageURL,
-			"images":     allImages,
-			"email":      user.Email,
+			"images":        allImages,
+			"email":         user.Email,
+			"is_pro":        user.IsPro,
+			"account_type":  user.AccountType,
+			"referral_code": user.ReferralCode,
 		},
 	})
 }

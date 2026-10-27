@@ -90,24 +90,51 @@ func HandleSwipe(c *fiber.Ctx) error {
 func GetWhoLikesMe(c *fiber.Ctx) error {
 	myEmail := GetCurrentUserEmail(c)
 	if myEmail == "" {
-		return c.Status(401).JSON(fiber.Map{"error": "Unauthorized: กรุณาเข้าสู่ระบบ", "likers": []fiber.Map{}})
+		return c.Status(401).JSON(fiber.Map{
+			"error":         "Unauthorized: กรุณาเข้าสู่ระบบ",
+			"likers":        []fiber.Map{},
+			"is_pro":        false,
+			"account_type":  "standard",
+			"referral_code": "",
+		})
+	}
+
+	cleanEmail := strings.ToLower(strings.TrimSpace(myEmail))
+
+	var me models.User
+	if err := config.DB.Where("LOWER(email) = ?", cleanEmail).First(&me).Error; err == nil {
+		if me.ReferralCode == "" {
+			me.ReferralCode = generateReferralCode(cleanEmail)
+			config.DB.Save(&me)
+		}
 	}
 
 	var likes []models.Like
-	config.DB.Where("liked_id = ?", myEmail).Find(&likes)
+	config.DB.Where("LOWER(liked_id) = ?", cleanEmail).Find(&likes)
 
 	likers := []fiber.Map{}
 	for _, l := range likes {
 		var user models.User
-		if config.DB.Preload("Images").Where("email = ?", l.LikerID).First(&user).Error == nil {
+		if config.DB.Preload("Images").Where("LOWER(email) = ?", strings.ToLower(l.LikerID)).First(&user).Error == nil {
 			imageURL := firstImageURL(user.Images)
+			prof := getProfileByEmail(user.Email)
+			age := calculateAge(prof.BirthDate)
+
 			likers = append(likers, fiber.Map{
-				"id":    user.Email,
-				"name":  user.Name,
-				"image": imageURL,
+				"id":      user.Email,
+				"name":    user.Name,
+				"image":   imageURL,
+				"faculty": prof.Faculty,
+				"caption": prof.Caption,
+				"age":     age,
 			})
 		}
 	}
 
-	return c.JSON(fiber.Map{"likers": likers})
+	return c.JSON(fiber.Map{
+		"likers":        likers,
+		"is_pro":        me.IsPro,
+		"account_type":  me.AccountType,
+		"referral_code": me.ReferralCode,
+	})
 }

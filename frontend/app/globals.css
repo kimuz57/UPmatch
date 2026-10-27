@@ -29,6 +29,47 @@ html, body {
 }
 
 /* ========================================================
+   Custom Sleek Scrollbar & No-Scrollbar Utilities
+   ======================================================== */
+
+/* สไตล์ Scrollbar แบบโมเดิร์น มินิมอล (ความหนา 6px มุมมน โปร่งแสง ไม่เกะกะสายตา) */
+* {
+  scrollbar-width: thin;
+  scrollbar-color: rgba(148, 163, 184, 0.45) transparent;
+}
+
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+::-webkit-scrollbar-thumb {
+  background-color: rgba(148, 163, 184, 0.4);
+  border-radius: 9999px;
+  transition: background-color 0.2s ease;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background-color: rgba(88, 28, 135, 0.5);
+}
+
+/* คลาสสำหรับซ่อน Scrollbar โดยที่ยังเลื่อน (Scroll) ด้วยนิ้ว/เมาส์ได้สมูท 100% */
+.no-scrollbar::-webkit-scrollbar,
+.scrollbar-none::-webkit-scrollbar {
+  display: none !important;
+}
+
+.no-scrollbar,
+.scrollbar-none {
+  -ms-overflow-style: none !important; /* IE & Edge */
+  scrollbar-width: none !important;    /* Firefox */
+}
+
+/* ========================================================
    Responsive Device Mode System:
    - "Mobile Mode": มือถือทุกรุ่น + iPad ทุกรุ่นในแนวตั้ง (Portrait)
    - "Desktop Mode": คอมพิวเตอร์ PC/Mac + iPad ในแนวนอน (Landscape >= 1024px)

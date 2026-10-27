@@ -334,6 +334,35 @@ export default function GlobalNotification() {
           }
         });
 
+        // เมื่อได้รับการอัปเกรดเป็น PRO (เพื่อนสมัครสำเร็จ)
+        eventSource.addEventListener("pro_upgrade", (e) => {
+          try {
+            const data = JSON.parse(e.data);
+            if (!data) return;
+
+            localStorage.setItem("upmatch_is_pro", "true");
+
+            window.dispatchEvent(
+              new CustomEvent("upmatch_notification", {
+                detail: { type: "pro_upgrade", data },
+              })
+            );
+
+            playNotificationChime("match");
+
+            showToast({
+              type: "match",
+              title: data.title || "อัปเกรดเป็น PRO สำเร็จ!",
+              content: data.message || "เพื่อนของคุณสมัครสำเร็จแล้ว! ปลดล็อกฟีเจอร์ดูคนแอบชอบและแมตช์ได้ทันที",
+              image: "/logo.png",
+              link: "/likes",
+              time: data.time || "เมื่อสักครู่",
+            });
+          } catch (err) {
+            console.error("Error processing pro_upgrade SSE:", err);
+          }
+        });
+
         eventSource.onerror = () => {
           if (eventSource) {
             eventSource.close();

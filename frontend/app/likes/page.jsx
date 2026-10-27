@@ -1,67 +1,156 @@
 // frontend/app/likes/page.jsx
+// avoid-ai-design-ignore: I3, C2
 "use client";
 
 import React, { useState, useEffect } from "react";
 import Navbar from "@/components/Navbar";
-import { Users, PlaySquare, Loader2, Heart, Eye } from "lucide-react";
-import { motion } from "framer-motion";
+import {
+  Users,
+  Loader2,
+  Heart,
+  Eye,
+  Copy,
+  CheckCheck,
+  Share2,
+  MessageCircle,
+  X,
+  UserCheck,
+} from "lucide-react";
+import { motion, AnimatePresence } from "framer-motion";
+import Link from "next/link";
 import { getApiBaseUrl, formatImageUrl } from "@/utils/api";
 
 export default function LikesPage() {
   const [whoLikesMe, setWhoLikesMe] = useState([]);
   const [loading, setLoading] = useState(true);
-  const [isUnlocked, setIsUnlocked] = useState(false);
-  const [adPlaying, setAdPlaying] = useState(false);
+  const [isPro, setIsPro] = useState(false);
+  const [referralCode, setReferralCode] = useState("");
+  const [copied, setCopied] = useState(false);
+  const [matchingId, setMatchingId] = useState(null);
+  const [matchedProfile, setMatchedProfile] = useState(null);
+
+  const getCookie = (name) => {
+    if (typeof document === "undefined") return "";
+    const value = `; ${document.cookie}`;
+    const parts = value.split(`; ${name}=`);
+    if (parts.length === 2) return parts.pop().split(";").shift();
+    return "";
+  };
+
+  const fetchWhoLikesMe = async () => {
+    try {
+      const token = getCookie("up_match_token");
+      const email = getCookie("upmatch_email");
+      const baseUrl = getApiBaseUrl();
+      const url = email
+        ? `${baseUrl}/api/v1/who-likes-me?email=${encodeURIComponent(email)}`
+        : `${baseUrl}/api/v1/who-likes-me`;
+
+      const res = await fetch(url, {
+        method: "GET",
+        credentials: "include",
+        headers: {
+          Authorization: `Bearer ${token}`,
+          "X-User-Email": email || "",
+        },
+      });
+
+      if (res.ok) {
+        const data = await res.json();
+        setWhoLikesMe(data.likers || []);
+        setIsPro(Boolean(data.is_pro));
+        if (data.referral_code) {
+          setReferralCode(data.referral_code);
+        }
+      }
+    } catch (error) {
+      console.error("Failed to fetch likes:", error);
+    } finally {
+      setLoading(false);
+    }
+  };
 
   useEffect(() => {
-    const fetchWhoLikesMe = async () => {
-      try {
-        const getCookie = (name) => {
-          if (typeof document === "undefined") return ""; 
-          const value = `; ${document.cookie}`;
-          const parts = value.split(`; ${name}=`);
-          if (parts.length === 2) return parts.pop().split(";").shift();
-          return "";
-        };
-        const token = getCookie("up_match_token");
-        const email = getCookie("upmatch_email");
-        const baseUrl = getApiBaseUrl();
-        const url = email
-          ? `${baseUrl}/api/v1/who-likes-me?email=${encodeURIComponent(email)}`
-          : `${baseUrl}/api/v1/who-likes-me`;
+    fetchWhoLikesMe();
 
-        const res = await fetch(url, {
-          method: "GET",
-          credentials: "include",
-          headers: {
-            Authorization: `Bearer ${token}`,
-            "X-User-Email": email || "",
-          },
-        });
-
-        if (res.ok) {
-          const data = await res.json();
-          setWhoLikesMe(data.likers || []);
-        }
-      } catch (error) {
-        console.error("Failed to fetch likes:", error);
-      } finally {
-        setLoading(false);
+    // ดักฟัง Real-time Event จาก SSE เมื่อเพื่อนสมัครสำเร็จและได้อัปเกรดเป็น PRO
+    const handleNotification = (e) => {
+      const { type } = e.detail || {};
+      if (type === "pro_upgrade") {
+        setIsPro(true);
+        fetchWhoLikesMe();
       }
     };
 
-    setIsUnlocked(localStorage.getItem("upmatch_likes_unlocked") === "true");
-    fetchWhoLikesMe();
+    window.addEventListener("upmatch_notification", handleNotification);
+    return () => {
+      window.removeEventListener("upmatch_notification", handleNotification);
+    };
   }, []);
 
-  const watchAdToUnlock = () => {
-    setAdPlaying(true);
-    setTimeout(() => {
-      setAdPlaying(false);
-      setIsUnlocked(true);
-      localStorage.setItem("upmatch_likes_unlocked", "true");
-      alert("ปลดล็อกเรียบร้อย คุณสามารถดูและกดแมตช์คนที่มาไลก์คุณได้ 5 คน");
-    }, 5000);
+  // สร้าง Referral Link เฉพาะบุคคล
+  const inviteUrl =
+    typeof window !== "undefined" && referralCode
+      ? `${window.location.origin}/?ref=${referralCode}`
+      : "";
+
+  const handleCopyLink = () => {
+    if (!inviteUrl) return;
+    navigator.clipboard.writeText(inviteUrl);
+    setCopied(true);
+    setTimeout(() => setCopied(false), 2500);
+  };
+
+  const handleShareLine = () => {
+    if (!inviteUrl) return;
+    const text = encodeURIComponent(
+      `มาเล่น UP Match ด้วยกันสิ! แพลตฟอร์มหาเพื่อนใหม่นิสิต ม.พะเยา: ${inviteUrl}`
+    );
+    window.open(`https://line.me/R/msg/text/?${text}`, "_blank");
+  };
+
+  // กดแมตช์คนที่มาไลก์เราทันที (สำหรับผู้ใช้ PRO)
+  const handleInstantMatch = async (liker) => {
+    if (!isPro) return;
+    setMatchingId(liker.id);
+
+    try {
+      const token = getCookie("up_match_token");
+      const email = getCookie("upmatch_email");
+      const baseUrl = getApiBaseUrl();
+
+      const res = await fetch(`${baseUrl}/api/v1/swipe`, {
+        method: "POST",
+        credentials: "include",
+        headers: {
+          Authorization: `Bearer ${token}`,
+          "X-User-Email": email || "",
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          my_email: email,
+          target_email: liker.id,
+          direction: "right",
+        }),
+      });
+
+      if (res.ok) {
+        // ลบคนที่แมตช์แล้วออกจากรายการคนแอบชอบ
+        setWhoLikesMe((prev) => prev.filter((item) => item.id !== liker.id));
+
+        // แสดง Match Popup
+        setMatchedProfile({
+          id: liker.id,
+          name: liker.name,
+          image: liker.image,
+          faculty: liker.faculty,
+        });
+      }
+    } catch (error) {
+      console.error("Match error:", error);
+    } finally {
+      setMatchingId(null);
+    }
   };
 
   return (
@@ -69,105 +158,260 @@ export default function LikesPage() {
       <div className="shrink-0 z-30">
         <Navbar />
       </div>
+
       <main className="flex-1 min-h-0 overflow-y-auto max-w-5xl mx-auto w-full px-3.5 sm:px-6 py-4 sm:py-6 page-bottom-padding">
-        
         {/* Clean Editorial Header */}
-        <div className="mb-6 flex flex-col sm:flex-row sm:items-center justify-between gap-2 border-b border-slate-200 pb-4">
+        <div className="mb-6 flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-slate-200 pb-4">
           <div className="flex items-center gap-3">
-            <div className="w-10 h-10 rounded-xl bg-purple-100 text-purple-900 flex items-center justify-center shrink-0">
+            <div className="w-10 h-10 rounded-xl bg-purple-100 text-purple-900 flex items-center justify-center shrink-0 shadow-xs">
               <Eye className="w-5 h-5" />
             </div>
             <div>
-              <h1 className="text-xl sm:text-2xl font-black text-slate-900">คนที่แอบชอบคุณ</h1>
-              <p className="text-xs text-slate-500 font-medium">
+              <div className="flex items-center gap-2">
+                <h1 className="text-xl sm:text-2xl font-black text-slate-900">
+                  คนที่แอบชอบคุณ
+                </h1>
+                {isPro && (
+                  <span className="text-[10px] sm:text-xs px-2 py-0.5 rounded-md bg-purple-900 text-white font-bold shadow-xs">
+                    PRO
+                  </span>
+                )}
+              </div>
+              <p className="text-xs text-slate-500 font-medium mt-0.5">
                 มีนิสิตส่งใจให้คุณทั้งหมด {whoLikesMe.length} คน
               </p>
             </div>
           </div>
-          {whoLikesMe.length > 0 && !isUnlocked && (
-            <span className="self-start sm:self-auto text-xs px-2.5 py-1 rounded-md bg-purple-50 text-purple-900 font-semibold border border-purple-200">
-              สถานะ: ซ่อนรูปภาพ
-            </span>
-          )}
+
+          <div className="flex items-center gap-2 self-start sm:self-auto">
+            {isPro ? (
+              <span className="text-xs px-3 py-1.5 rounded-lg bg-purple-50 text-purple-900 font-bold border border-purple-200 flex items-center gap-1.5 shadow-2xs">
+                <UserCheck className="w-3.5 h-3.5 text-purple-800" />
+                <span>สถานะ: สมาชิก PRO (ดูและแมตช์ได้ทันที)</span>
+              </span>
+            ) : (
+              <span className="text-xs px-3 py-1.5 rounded-lg bg-slate-100 text-slate-700 font-semibold border border-slate-200">
+                สถานะ: บัญชีทั่วไป (รูปภาพเบลอ)
+              </span>
+            )}
+          </div>
         </div>
 
+        {/* Loading State */}
         {loading ? (
           <div className="flex flex-col items-center justify-center py-20">
             <Loader2 className="w-8 h-8 animate-spin text-purple-800 mb-2" />
-            <p className="text-xs text-slate-600 font-semibold">กำลังโหลดข้อมูลคนแอบชอบ...</p>
+            <p className="text-xs text-slate-600 font-semibold">
+              กำลังโหลดข้อมูลคนแอบชอบ...
+            </p>
           </div>
         ) : whoLikesMe.length === 0 ? (
           <div className="flex flex-col items-center justify-center py-20 text-center">
             <div className="w-14 h-14 bg-purple-100 rounded-xl flex items-center justify-center mb-3 text-purple-800">
               <Heart className="w-7 h-7" />
             </div>
-            <p className="text-slate-600 font-medium text-sm">ยังไม่มีคนแอบชอบคุณในขณะนี้<br/>ลองไปปัดเพื่อนๆ เพิ่มดูสิ</p>
+            <p className="text-slate-600 font-medium text-sm leading-relaxed">
+              ยังไม่มีคนแอบชอบคุณในขณะนี้
+              <br />
+              ลองไปปัดเพื่อนๆ เพิ่มดูสิ
+            </p>
           </div>
         ) : (
+          /* Grid of Likers */
           <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-3 sm:gap-4">
             {whoLikesMe.map((liker, idx) => (
-              <motion.div 
-                initial={{ opacity: 0, scale: 0.95 }} 
-                animate={{ opacity: 1, scale: 1 }} 
-                transition={{ delay: idx * 0.05 }}
-                key={idx} 
-                className="relative aspect-[3/4] rounded-xl overflow-hidden shadow-xs border border-slate-200 bg-white"
+              <motion.div
+                initial={{ opacity: 0, scale: 0.96 }}
+                animate={{ opacity: 1, scale: 1 }}
+                transition={{ delay: idx * 0.04 }}
+                key={liker.id || idx}
+                className="relative aspect-[3/4.4] rounded-xl overflow-hidden shadow-xs border border-slate-200 bg-slate-900 flex flex-col justify-end group"
               >
-                <img 
-                  src={formatImageUrl(liker.image)} 
-                  alt="Liker" 
-                  className={`w-full h-full object-cover transition duration-300 ${!isUnlocked ? 'blur-2xl scale-110' : ''}`}
+                {/* Liker Photo */}
+                <img
+                  src={formatImageUrl(liker.image)}
+                  alt="Liker"
+                  className={`absolute inset-0 w-full h-full object-cover transition-transform duration-300 ${
+                    !isPro ? "blur-2xl scale-110 opacity-70" : "group-hover:scale-105"
+                  }`}
                 />
-                
-                {!isUnlocked && (
-                  <div className="absolute inset-0 flex items-center justify-center bg-slate-900/30">
-                    <Heart className="w-8 h-8 text-white opacity-80" />
+
+                {/* Lock Overlay when not PRO */}
+                {!isPro && (
+                  <div className="absolute inset-0 flex flex-col items-center justify-center bg-slate-900/35 p-2 text-center z-10 pointer-events-none">
+                    <div className="w-10 h-10 rounded-full bg-white/25 flex items-center justify-center text-white mb-1 shadow-xs">
+                      <Heart className="w-5 h-5 fill-white/80 text-white" />
+                    </div>
+                    <span className="text-[11px] font-bold text-white drop-shadow-sm">
+                      มีคนถูกใจคุณ
+                    </span>
                   </div>
                 )}
 
-                <div className="absolute bottom-0 left-0 w-full p-3 bg-gradient-to-t from-slate-950/80 to-transparent">
-                  <p className="text-white font-bold text-xs truncate w-full drop-shadow-xs">
-                    {isUnlocked ? liker.name : "ซ่อนโปรไฟล์"}
-                  </p>
+                {/* Bottom Card Content */}
+                <div className="relative z-20 p-2.5 sm:p-3 bg-gradient-to-t from-slate-950/90 via-slate-950/60 to-transparent text-white">
+                  <h3 className="font-bold text-xs truncate drop-shadow-sm">
+                    {isPro ? liker.name : "ซ่อนโปรไฟล์"}
+                    {isPro && liker.age ? `, ${liker.age}` : ""}
+                  </h3>
+                  {isPro && liker.faculty && (
+                    <p className="text-[10px] text-purple-200 truncate font-medium">
+                      {liker.faculty}
+                    </p>
+                  )}
+
+                  {/* Instant Match Button for PRO Users */}
+                  {isPro ? (
+                    <button
+                      type="button"
+                      disabled={matchingId === liker.id}
+                      onClick={() => handleInstantMatch(liker)}
+                      className="w-full mt-2 py-1.5 px-2.5 rounded-lg bg-rose-600 hover:bg-rose-700 active:scale-[0.98] text-white text-[11px] font-bold shadow-xs transition flex items-center justify-center gap-1.5 cursor-pointer disabled:opacity-50"
+                      title="กดแมตช์ทันที"
+                    >
+                      {matchingId === liker.id ? (
+                        <Loader2 className="w-3.5 h-3.5 animate-spin" />
+                      ) : (
+                        <Heart className="w-3.5 h-3.5 fill-current" />
+                      )}
+                      <span>แมตช์เลย</span>
+                    </button>
+                  ) : (
+                    <div className="mt-1.5 text-[10px] text-purple-200/80 font-medium truncate">
+                      ปลดล็อก PRO เพื่อแมตช์
+                    </div>
+                  )}
                 </div>
               </motion.div>
             ))}
           </div>
         )}
 
-        {/* Ad Unlock Banner */}
-        {!isUnlocked && whoLikesMe.length > 0 && (
-          <div className="mt-8 p-6 bg-white rounded-2xl border border-slate-200 shadow-xs max-w-lg mx-auto text-center space-y-4">
-            <div>
-              <h2 className="text-base font-black text-slate-900">ปลดล็อกเพื่อดูว่าใครแอบชอบคุณ</h2>
-              <p className="text-xs text-slate-600 mt-1">คุณจะได้รับสิทธิ์กดไลก์กลับและแมตช์ได้ทันทีสูงสุด 5 คน</p>
+        {/* Referral Unlock Box (สำหรับผู้ใช้ทั่วไปที่ยังไม่ได้เป็น PRO) */}
+        {!isPro && whoLikesMe.length > 0 && (
+          <div className="mt-8 p-5 sm:p-7 bg-white rounded-2xl border border-slate-200 shadow-xs max-w-lg mx-auto text-center space-y-4">
+            <div className="w-12 h-12 mx-auto rounded-xl bg-purple-100 text-purple-900 flex items-center justify-center shadow-xs">
+              <Users className="w-6 h-6" />
             </div>
-            
-            {adPlaying ? (
-              <div className="w-full py-4 rounded-xl bg-slate-900 flex flex-col items-center justify-center text-white space-y-2">
-                <Loader2 className="w-5 h-5 animate-spin text-purple-300" />
-                <span className="text-xs font-semibold">กำลังเล่นวิดีโอโฆษณา... (5 วินาที)</span>
-              </div>
-            ) : (
-              <div className="space-y-2.5">
-                <button 
-                  onClick={() => alert("ระบบแชร์ลิงก์ให้เพื่อนกำลังพัฒนา")}
-                  className="w-full py-3 rounded-xl bg-purple-50 text-purple-900 font-bold text-xs border border-purple-200 hover:bg-purple-100 transition cursor-pointer flex items-center justify-center gap-2"
+
+            <div>
+              <h2 className="text-base sm:text-lg font-black text-slate-900">
+                ชวนเพื่อน 1 คนเพื่อปลดล็อกเป็น PRO ถาวร
+              </h2>
+              <p className="text-xs text-slate-600 mt-1 leading-relaxed">
+                ส่งลิงก์ด้านล่างให้เพื่อนนิสิต ม.พะเยา 1 คน เมื่อเพื่อนสมัครสำเร็จ
+                ระบบจะอัปเกรดบัญชีของคุณเป็น PRO ทันที ดูรูปชัดเจนและกดแมตช์ได้ทุกคน
+              </p>
+            </div>
+
+            {/* Referral Link Box */}
+            <div className="space-y-2 pt-1">
+              <div className="flex items-center gap-2 p-1.5 bg-slate-50 border border-slate-200 rounded-xl">
+                <input
+                  type="text"
+                  readOnly
+                  value={inviteUrl || "กำลังสร้างลิงก์ชวนเพื่อน..."}
+                  className="flex-1 bg-transparent text-xs text-slate-800 font-mono px-2 py-1 outline-none select-all truncate"
+                />
+                <button
+                  type="button"
+                  onClick={handleCopyLink}
+                  disabled={!inviteUrl}
+                  className="px-3 py-1.5 rounded-lg bg-purple-900 hover:bg-purple-950 text-white font-bold text-xs shadow-xs transition flex items-center gap-1.5 cursor-pointer shrink-0 disabled:opacity-50"
                 >
-                  <Users className="w-4 h-4" /> ชวนเพื่อน 3 คน (ใช้งานฟรี)
-                </button>
-                <button 
-                  onClick={watchAdToUnlock}
-                  className="w-full py-3 rounded-xl bg-rose-600 hover:bg-rose-700 text-white font-bold text-xs shadow-xs transition flex items-center justify-center gap-2 cursor-pointer"
-                >
-                  <PlaySquare className="w-4 h-4" /> ดูโฆษณาสั้นๆ เพื่อปลดล็อก
+                  {copied ? (
+                    <>
+                      <CheckCheck className="w-3.5 h-3.5" />
+                      <span>คัดลอกแล้ว</span>
+                    </>
+                  ) : (
+                    <>
+                      <Copy className="w-3.5 h-3.5" />
+                      <span>คัดลอกลิงก์</span>
+                    </>
+                  )}
                 </button>
               </div>
-            )}
+
+              {/* Share to LINE Button */}
+              <button
+                type="button"
+                onClick={handleShareLine}
+                disabled={!inviteUrl}
+                className="w-full py-2.5 px-4 rounded-xl bg-[#06C755] hover:bg-[#05b34c] text-white font-bold text-xs shadow-xs transition flex items-center justify-center gap-2 cursor-pointer disabled:opacity-50"
+              >
+                <Share2 className="w-4 h-4" />
+                <span>แชร์ไปยัง LINE ให้เพื่อนสมัคร</span>
+              </button>
+            </div>
+
+            {/* Live Indicator */}
+            <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-slate-100 text-slate-600 text-[11px] font-medium border border-slate-200">
+              <span className="w-2 h-2 rounded-full bg-rose-600 animate-ping shrink-0" />
+              <span>ระบบ Real-time กำลังรอเพื่อน 1 คนสมัครผ่านลิงก์...</span>
+            </div>
           </div>
         )}
-
       </main>
+
+      {/* Match Success Popup Modal */}
+      <AnimatePresence>
+        {matchedProfile && (
+          <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/60">
+            <motion.div
+              initial={{ scale: 0.9, opacity: 0 }}
+              animate={{ scale: 1, opacity: 1 }}
+              exit={{ scale: 0.9, opacity: 0 }}
+              className="bg-white rounded-2xl max-w-sm w-full p-6 shadow-xs border border-slate-200 text-center relative"
+            >
+              <button
+                type="button"
+                onClick={() => setMatchedProfile(null)}
+                className="absolute top-3.5 right-3.5 p-1 rounded-lg text-slate-400 hover:text-slate-700 hover:bg-slate-100 transition cursor-pointer"
+              >
+                <X className="w-4 h-4" />
+              </button>
+
+              <div className="w-12 h-12 mx-auto mb-3 bg-rose-50 rounded-xl flex items-center justify-center text-rose-600 shadow-xs">
+                <Heart className="w-6 h-6 fill-rose-600 text-rose-600" />
+              </div>
+
+              <h2 className="text-xl font-black text-slate-900 mb-1">
+                ใจตรงกันแล้ว!
+              </h2>
+              <p className="text-xs text-slate-600 mb-5 leading-relaxed">
+                คุณและ <span className="font-bold text-slate-900">{matchedProfile.name}</span>{" "}
+                กดใจให้กัน ตอนนี้เปิดห้องแชทพร้อมคุยได้ทันที
+              </p>
+
+              <div className="w-20 h-20 mx-auto rounded-full overflow-hidden border-2 border-purple-200 shadow-xs mb-6">
+                <img
+                  src={formatImageUrl(matchedProfile.image)}
+                  alt={matchedProfile.name}
+                  className="w-full h-full object-cover"
+                />
+              </div>
+
+              <div className="flex gap-2.5">
+                <button
+                  type="button"
+                  onClick={() => setMatchedProfile(null)}
+                  className="flex-1 py-2.5 px-4 rounded-xl border border-slate-200 text-xs font-bold text-slate-600 hover:bg-slate-50 transition cursor-pointer"
+                >
+                  ดูคนอื่นต่อ
+                </button>
+                <Link
+                  href={`/chat/${matchedProfile.id}`}
+                  className="flex-1 py-2.5 px-4 rounded-xl bg-purple-900 hover:bg-purple-950 text-white text-xs font-bold shadow-xs transition flex items-center justify-center gap-1.5 cursor-pointer"
+                >
+                  <MessageCircle className="w-3.5 h-3.5" />
+                  <span>ทักแชทเลย</span>
+                </Link>
+              </div>
+            </motion.div>
+          </div>
+        )}
+      </AnimatePresence>
     </div>
   );
 }

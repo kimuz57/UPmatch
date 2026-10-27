@@ -2,14 +2,16 @@
 "use client";
 
 import React, { useState, useMemo } from "react";
+// avoid-ai-design-ignore: I3
 import {
   Mail,
   ShieldCheck,
   Send,
   AlertCircle,
-  HeartHandshake,
   Loader2,
   ArrowLeft,
+  Check,
+  CheckCircle2,
 } from "lucide-react";
 import { parseStudentEmail } from "../utils/emailParser";
 import { getApiBaseUrl } from "../utils/api";
@@ -87,6 +89,11 @@ export default function AuthPage({ onLoginSuccess, onBack }) {
     setLoading(true);
     setErrorMsg("");
 
+    const referralCode =
+      (typeof sessionStorage !== "undefined" && sessionStorage.getItem("upmatch_referral_code")) ||
+      (typeof localStorage !== "undefined" && localStorage.getItem("upmatch_referral_code")) ||
+      "";
+
     try {
       const res = await fetch(`${getApiBaseUrl()}/api/v1/auth/verify-otp`, {
         method: "POST",
@@ -94,12 +101,20 @@ export default function AuthPage({ onLoginSuccess, onBack }) {
         body: JSON.stringify({
           email: email.trim().toLowerCase(),
           otp: otp.trim(),
+          referral_code: referralCode,
         }),
       });
 
       const data = await res.json();
       if (!res.ok) {
         throw new Error(data.error || "รหัส OTP ไม่ถูกต้องหรือหมดอายุแล้ว");
+      }
+
+      if (referralCode) {
+        try {
+          sessionStorage.removeItem("upmatch_referral_code");
+          localStorage.removeItem("upmatch_referral_code");
+        } catch (e) {}
       }
 
       const cleanEmail = email.trim().toLowerCase();
@@ -140,15 +155,13 @@ export default function AuthPage({ onLoginSuccess, onBack }) {
 
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-2.5">
-            <div className="w-10 h-10 rounded-xl bg-purple-900 flex items-center justify-center text-white shadow-xs">
-              <HeartHandshake className="w-5 h-5" />
-            </div>
+            <img src="/logo.png" alt="UP Match" className="w-14 h-14" />
             <div>
               <span className="text-xl font-black tracking-tight text-slate-900">
                 UP Match
               </span>
               <span className="block text-[10px] font-bold text-purple-800">
-                มหาวิทยาลัยพะเยา
+                
               </span>
             </div>
           </div>
@@ -162,7 +175,7 @@ export default function AuthPage({ onLoginSuccess, onBack }) {
         <div>
           <h1 className="text-2xl font-black text-slate-950">
             {step === "email"
-              ? "เข้าสู่ระบบนิสิต ม.พะเยา"
+              ? "เข้าสู่ระบบ"
               : "กรอกรหัส OTP 6 หลัก"}
           </h1>
           <p className="text-xs text-slate-600 mt-1.5 leading-relaxed font-normal">
@@ -183,6 +196,28 @@ export default function AuthPage({ onLoginSuccess, onBack }) {
           <div className="p-3.5 rounded-xl bg-purple-50 border border-purple-200 text-purple-900 text-xs font-semibold flex items-center gap-2">
             <CheckCircle2 className="w-4 h-4 shrink-0 text-purple-800" />
             <span>{infoMsg}</span>
+          </div>
+        )}
+
+        {step === "otp" && (
+          <div className="p-3.5 rounded-xl bg-slate-50 border border-slate-200 text-xs text-slate-700 space-y-1.5">
+            <div className="flex items-center gap-2 font-bold text-slate-900">
+              <Mail className="w-4 h-4 text-purple-800 shrink-0" />
+              <span>ตรวจสอบที่ Microsoft Outlook (@up.ac.th)</span>
+            </div>
+            <p className="text-[11px] text-slate-600 pl-6 leading-relaxed">
+              หากไม่พบรหัสในกล่องจดหมายเข้า โปรดตรวจสอบในโฟลเดอร์ <strong className="text-slate-900 font-bold">อีเมลขยะ (Junk Email)</strong> หรือ <strong className="text-slate-900 font-bold">สแปม (Spam)</strong>
+            </p>
+            <div className="pl-6 pt-0.5">
+              <a
+                href="https://outlook.office.com"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="inline-flex items-center gap-1 text-[11px] font-bold text-purple-800 hover:text-purple-950 underline underline-offset-2"
+              >
+                เปิด Microsoft Outlook Web
+              </a>
+            </div>
           </div>
         )}
 

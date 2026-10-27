@@ -228,6 +228,42 @@ func (h *chatHub) BroadcastMatch(matchID uint, userAEmail, userBEmail string) {
 	})
 }
 
+// 🚀 กระจายการแจ้งเตือน Realtime เมื่อผู้ใช้ได้รับการอัปเกรดเป็น PRO สำเร็จ
+func (h *chatHub) BroadcastProUpgrade(userEmail string) {
+	cleanEmail := strings.ToLower(strings.TrimSpace(userEmail))
+	payload := SSEPayload{
+		Event: "pro_upgrade",
+		Data: fiber.Map{
+			"type":       "pro_upgrade",
+			"user_email": cleanEmail,
+			"is_pro":     true,
+			"title":      "อัปเกรดเป็น PRO สำเร็จ! ⭐",
+			"message":    "เพื่อนของคุณสมัครสำเร็จแล้ว! ปลดล็อกฟีเจอร์ดูคนแอบชอบและแมตช์ได้ทันที",
+			"time":       time.Now().Format("15:04"),
+		},
+	}
+
+	h.mu.RLock()
+	defer h.mu.RUnlock()
+
+	for client := range h.clients {
+		if strings.ToLower(strings.TrimSpace(client.email)) == cleanEmail {
+			select {
+			case client.eventChan <- payload:
+			default:
+			}
+		}
+	}
+
+	// ส่ง Web Push Notification ไปยังมือถือ/เบราว์เซอร์ด้วย
+	utils.SendWebPushToUser(cleanEmail, utils.PushPayload{
+		Title: "อัปเกรดเป็น PRO สำเร็จ! ⭐",
+		Body:  "เพื่อนของคุณสมัครสำเร็จแล้ว! ปลดล็อกฟีเจอร์ดูคนแอบชอบและแมตช์ได้ทันที",
+		Icon:  "/logo.png",
+		URL:   "/likes",
+	})
+}
+
 // HashEmail แปลง Email เป็น Hash (MD5 32 hex) เพื่อซ่อน Email ใน URL เพื่อความเป็นส่วนตัว
 func HashEmail(email string) string {
 	clean := strings.ToLower(strings.TrimSpace(email))
