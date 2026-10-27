@@ -11,7 +11,7 @@ const promptFont = Prompt({
   display: "swap",
 });
 
-const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || "https://up-match.tcmg.me";
+const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || "https://upmatch.tcmg.me";
 
 export const metadata: Metadata = {
   metadataBase: new URL(siteUrl),
