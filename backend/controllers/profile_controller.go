@@ -6,6 +6,7 @@ import (
 	"mime/multipart"
 	"os"
 	"path/filepath"
+	"strconv"
 	"strings"
 	"time"
 
@@ -17,6 +18,24 @@ import (
 type PhotoManifestItem struct {
 	Type string `json:"type"` // "existing" หรือ "new"
 	URL  string `json:"url"`  // สำหรับ existing
+}
+
+func getMinProfilePhotos() int {
+	if s := os.Getenv("MIN_PROFILE_PHOTOS"); s != "" {
+		if n, err := strconv.Atoi(s); err == nil && n >= 1 {
+			return n
+		}
+	}
+	return 2
+}
+
+func getMaxProfilePhotos() int {
+	if s := os.Getenv("MAX_PROFILE_PHOTOS"); s != "" {
+		if n, err := strconv.Atoi(s); err == nil && n >= 1 {
+			return n
+		}
+	}
+	return 9
 }
 
 // บันทึกข้อมูลโปรไฟล์และอัปโหลดรูปภาพ (Multi-step complete)
@@ -76,11 +95,13 @@ func SaveProfile(c *fiber.Ctx) error {
 			return c.Status(400).JSON(fiber.Map{"error": "รูปแบบรายการรูปภาพไม่ถูกต้อง"})
 		}
 
-		if len(manifest) < 2 {
-			return c.Status(400).JSON(fiber.Map{"error": "บังคับมีรูปภาพอย่างน้อย 2 รูปครับ"})
+		minPhotos := getMinProfilePhotos()
+		maxPhotos := getMaxProfilePhotos()
+		if len(manifest) < minPhotos {
+			return c.Status(400).JSON(fiber.Map{"error": fmt.Sprintf("บังคับมีรูปภาพอย่างน้อย %d รูปครับ", minPhotos)})
 		}
-		if len(manifest) > 9 {
-			return c.Status(400).JSON(fiber.Map{"error": "มีรูปภาพได้สูงสุด 9 รูปครับ"})
+		if len(manifest) > maxPhotos {
+			return c.Status(400).JSON(fiber.Map{"error": fmt.Sprintf("มีรูปภาพได้สูงสุด %d รูปครับ", maxPhotos)})
 		}
 
 		newCount := 0

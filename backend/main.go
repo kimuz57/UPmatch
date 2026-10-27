@@ -3,6 +3,7 @@ package main
 
 import (
 	"log"
+	"os"
 
 	"github.com/gofiber/fiber/v2"
 	"github.com/gofiber/fiber/v2/middleware/cors"
@@ -28,6 +29,11 @@ func main() {
 
 	app := fiber.New()
 
+	frontendURL := os.Getenv("FRONTEND_URL")
+	if frontendURL == "" {
+		frontendURL = "http://localhost:3003, http://127.0.0.1:3003"
+	}
+
 	// Middleware พื้นฐาน
 	app.Use(logger.New())
 	app.Use(cors.New(cors.Config{
@@ -35,7 +41,7 @@ func main() {
 			// อนุญาตทุก Origin ในการพัฒนาวง LAN เช่น localhost, 127.0.0.1, 192.168.*
 			return true
 		},
-		AllowOrigins:     "http://localhost:3003, http://127.0.0.1:3003, http://192.168.1.109:3003",
+		AllowOrigins:     frontendURL,
 		AllowHeaders:     "Origin, Content-Type, Accept, Authorization, X-User-Email",
 		AllowCredentials: true,
 	}))
@@ -46,7 +52,12 @@ func main() {
 	// เรียกใช้งาน Routes ทั้งหมดที่เราแยกไว้
 	routes.SetupRoutes(app)
 
+	port := os.Getenv("PORT")
+	if port == "" {
+		port = "8081"
+	}
+
 	// รันเซิร์ฟเวอร์
-	log.Println("🚀 Backend พร้อมทำงานที่ http://localhost:8081")
-	log.Fatal(app.Listen(":8081"))
+	log.Printf("🚀 Backend พร้อมทำงานที่ http://localhost:%s\n", port)
+	log.Fatal(app.Listen(":" + port))
 }

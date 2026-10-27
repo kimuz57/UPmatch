@@ -3,9 +3,11 @@ import { NextResponse, type NextRequest } from 'next/server';
 
 function getSessionSignature(tok: string): string {
   if (!tok) return "";
+  const secret = process.env.NEXT_PUBLIC_SESSION_SECRET || "";
+  const combined = secret ? `${secret}:${tok}` : tok;
   let h1 = 0xdeadbeef, h2 = 0x41c6ce57;
-  for (let i = 0; i < tok.length; i++) {
-    const ch = tok.charCodeAt(i);
+  for (let i = 0; i < combined.length; i++) {
+    const ch = combined.charCodeAt(i);
     h1 = Math.imul(h1 ^ ch, 2654435761);
     h2 = Math.imul(h2 ^ ch, 1597334677);
   }
@@ -26,8 +28,10 @@ export function middleware(request: NextRequest) {
     path.startsWith('/profile');
 
   // 2. ดึง Token และ Email จาก Cookie (ที่เซฟไว้ตอนยืนยัน OTP)
-  const tokenCookie = request.cookies.get('up_match_token')?.value;
-  const emailCookie = request.cookies.get('upmatch_email')?.value;
+  const tokenCookieName = process.env.NEXT_PUBLIC_SESSION_COOKIE_NAME || 'up_match_token';
+  const emailCookieName = process.env.NEXT_PUBLIC_EMAIL_COOKIE_NAME || 'upmatch_email';
+  const tokenCookie = request.cookies.get(tokenCookieName)?.value || request.cookies.get('up_match_token')?.value;
+  const emailCookie = request.cookies.get(emailCookieName)?.value || request.cookies.get('upmatch_email')?.value;
   const token = tokenCookie || emailCookie;
 
   // 3. ถ้าพยายามเข้าหน้าสงวน (Protected) แต่ "ไม่มี Token" -> เตะกลับไปหน้าแรกทันที

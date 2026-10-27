@@ -98,11 +98,26 @@ var (
 	gmailServiceMu sync.Mutex
 )
 
+func getCredentialsFilePath() string {
+	if path := os.Getenv("GMAIL_CREDENTIALS_FILE"); path != "" {
+		return path
+	}
+	return "credentials.json"
+}
+
+func getTokenFilePath() string {
+	if path := os.Getenv("GMAIL_TOKEN_FILE"); path != "" {
+		return path
+	}
+	return "token.json"
+}
+
 // GetGmailConfig คืนค่า oauth2.Config จาก credentials.json
 func GetGmailConfig() (*oauth2.Config, error) {
-	b, err := os.ReadFile("credentials.json")
+	credFile := getCredentialsFilePath()
+	b, err := os.ReadFile(credFile)
 	if err != nil {
-		return nil, fmt.Errorf("unable to read client secret file: %v", err)
+		return nil, fmt.Errorf("unable to read client secret file (%s): %v", credFile, err)
 	}
 
 	config, err := google.ConfigFromJSON(b, gmail.GmailSendScope)
@@ -127,7 +142,7 @@ func getGmailClient() (*gmail.Service, error) {
 		return nil, err
 	}
 
-	tokFile := "token.json"
+	tokFile := getTokenFilePath()
 	tok, err := TokenFromFile(tokFile)
 	if err != nil {
 		// ถ้าไม่มี Token จะให้ล็อกอินผ่านเบราว์เซอร์

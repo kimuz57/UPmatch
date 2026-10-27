@@ -4,6 +4,7 @@ import React, { useState, useEffect } from "react";
 import Navbar from "@/components/Navbar";
 import { Heart, MessageCircle, Loader2 } from "lucide-react";
 import Link from "next/link";
+import { getApiBaseUrl, formatImageUrl } from "@/utils/api";
 
 export default function MatchesPage() {
   const [matches, setMatches] = useState([]);
@@ -21,7 +22,8 @@ export default function MatchesPage() {
         const token = getCookie("up_match_token");
 
         // ยิง API ไปดึงคนที่ Match กันแล้วจาก Backend
-        const res = await fetch("http://localhost:8080/api/v1/matches", {
+        const baseUrl = getApiBaseUrl();
+        const res = await fetch(`${baseUrl}/api/v1/matches`, {
           method: "GET",
           headers: { "Authorization": `Bearer ${token}`, "Content-Type": "application/json" }
         });
@@ -58,7 +60,7 @@ export default function MatchesPage() {
           <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-4">
             {matches.map((match) => (
               <div key={match.id} className="relative aspect-[3/4] rounded-2xl overflow-hidden group shadow-md border border-purple-100 bg-white">
-                <img src={match.image || "/placeholder.jpg"} alt={match.name} className="w-full h-full object-cover transition-transform group-hover:scale-105" />
+                <img src={formatImageUrl(match.image)} alt={match.name} className="w-full h-full object-cover transition-transform group-hover:scale-105" />
                 <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent" />
                 
                 {match.online && (

@@ -6,6 +6,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"net/url"
+	"os"
 	"sort"
 	"strings"
 	"sync"
@@ -651,7 +652,13 @@ func ChatSSE(c *fiber.Ctx) error {
 
 	origin := c.Get("Origin")
 	if origin == "" {
-		origin = "http://localhost:3003"
+		frontendURL := os.Getenv("FRONTEND_URL")
+		if frontendURL != "" {
+			parts := strings.Split(frontendURL, ",")
+			origin = strings.TrimSpace(parts[0])
+		} else {
+			origin = "http://localhost:3003"
+		}
 	}
 	c.Set("Access-Control-Allow-Origin", origin)
 	c.Set("Access-Control-Allow-Credentials", "true")

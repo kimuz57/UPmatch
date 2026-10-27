@@ -5,12 +5,14 @@ import (
 	"encoding/hex"
 	"fmt"
 	"log"
+	"os"
+	"strconv"
 	"strings"
 	"time"
 
 	"github.com/gofiber/fiber/v2"
 	"github.com/redis/go-redis/v9"
-	
+
 	"upmatch-backend/config" // นำเข้า config เพื่อใช้งาน RedisClient
 	"upmatch-backend/utils"
 )
@@ -25,6 +27,64 @@ type VerifyRequest struct {
 	OTP   string `json:"otp"`
 }
 
+func getSessionCookieName() string {
+	if name := os.Getenv("SESSION_COOKIE_NAME"); name != "" {
+		return name
+	}
+	return "up_match_token"
+}
+
+func getEmailCookieName() string {
+	if name := os.Getenv("SESSION_EMAIL_COOKIE_NAME"); name != "" {
+		return name
+	}
+	return "upmatch_email"
+}
+
+func getSessionTokenPrefix() string {
+	if prefix := os.Getenv("SESSION_TOKEN_PREFIX"); prefix != "" {
+		return prefix
+	}
+	return "up_sess_"
+}
+
+func getSessionDuration() time.Duration {
+	if daysStr := os.Getenv("SESSION_DURATION_DAYS"); daysStr != "" {
+		if days, err := strconv.Atoi(daysStr); err == nil && days > 0 {
+			return time.Duration(days) * 24 * time.Hour
+		}
+	}
+	return 7 * 24 * time.Hour
+}
+
+func getOTPExpiry() time.Duration {
+	if minStr := os.Getenv("OTP_EXPIRY_MINUTES"); minStr != "" {
+		if mins, err := strconv.Atoi(minStr); err == nil && mins > 0 {
+			return time.Duration(mins) * time.Minute
+		}
+	}
+	return 5 * time.Minute
+}
+
+func checkTestAccount(email string) (bool, string) {
+	enableTest := os.Getenv("ENABLE_TEST_ACCOUNTS")
+	if enableTest == "false" || enableTest == "0" {
+		return false, ""
+	}
+	prefix := os.Getenv("TEST_ACCOUNT_PREFIX")
+	if prefix == "" {
+		prefix = "123"
+	}
+	otp := os.Getenv("TEST_ACCOUNT_OTP")
+	if otp == "" {
+		otp = "123456"
+	}
+	if strings.HasPrefix(email, prefix) {
+		return true, otp
+	}
+	return false, ""
+}
+
 func SendOTP(c *fiber.Ctx) error {
 	var req OTPRequest
 	if err := c.BodyParser(&req); err != nil {
@@ -33,22 +93,23 @@ func SendOTP(c *fiber.Ctx) error {
 
 	// 1. สุ่มรหัส OTP 6 หลัก
 	otp := utils.GenerateOTP()
+	otpExpiry := getOTPExpiry()
 
-	// 2. บันทึก OTP ลง Redis พร้อมตั้งเวลาหมดอายุ (5 นาที)
+	// 2. บันทึก OTP ลง Redis พร้อมตั้งเวลาหมดอายุจาก env
 	redisKey := fmt.Sprintf("upmatch:otp:%s", req.Email)
-	err := config.RedisClient.Set(config.Ctx, redisKey, otp, 5*time.Minute).Err()
+	err := config.RedisClient.Set(config.Ctx, redisKey, otp, otpExpiry).Err()
 	if err != nil {
 		log.Println("❌ บันทึก Redis ล้มเหลว:", err)
 		return c.Status(500).JSON(fiber.Map{"error": "ระบบขัดข้อง ไม่สามารถสร้างรหัส OTP ได้"})
 	}
-	log.Printf("✅ บันทึก OTP ลง Redis สำเร็จ: %s สำหรับอีเมล: %s (หมดอายุใน 5 นาที)", otp, req.Email)
+	log.Printf("✅ บันทึก OTP ลง Redis สำเร็จ: %s สำหรับอีเมล: %s (หมดอายุใน %v)", otp, req.Email, otpExpiry)
 
-	// สำหรับบัญชีทดสอบที่ขึ้นต้นด้วย 123 ให้ใช้ OTP 123456 เสมอโดยไม่ต้องยิง Gmail จริง
-	if strings.HasPrefix(req.Email, "123") {
-		_ = config.RedisClient.Set(config.Ctx, redisKey, "123456", 24*time.Hour).Err()
-		log.Printf("🧪 บัญชีทดสอบ %s: ใช้ OTP 123456", req.Email)
+	// สำหรับบัญชีทดสอบที่เปิดใช้งานผ่าน .env
+	if isTest, testOTP := checkTestAccount(req.Email); isTest {
+		_ = config.RedisClient.Set(config.Ctx, redisKey, testOTP, 24*time.Hour).Err()
+		log.Printf("🧪 บัญชีทดสอบ %s: ใช้ OTP %s", req.Email, testOTP)
 		return c.Status(200).JSON(fiber.Map{
-			"message": "รหัส OTP ทดสอบคือ 123456",
+			"message": fmt.Sprintf("รหัส OTP ทดสอบคือ %s", testOTP),
 		})
 	}
 
@@ -79,11 +140,11 @@ func VerifyOTP(c *fiber.Ctx) error {
 	redisKey := fmt.Sprintf("upmatch:otp:%s", req.Email)
 	savedOTP, err := config.RedisClient.Get(config.Ctx, redisKey).Result()
 	
-	if strings.HasPrefix(req.Email, "123") && req.OTP == "123456" {
-		savedOTP = "123456"
+	if isTest, testOTP := checkTestAccount(req.Email); isTest && req.OTP == testOTP {
+		savedOTP = testOTP
 		err = nil
 	} else if err == redis.Nil {
-		// หา key ไม่เจอ = รหัสหมดอายุไปแล้ว 5 นาที หรืออีเมลนี้ยังไม่ได้กดขอ OTP
+		// หา key ไม่เจอ = รหัสหมดอายุไปแล้ว หรืออีเมลนี้ยังไม่ได้กดขอ OTP
 		return c.Status(400).JSON(fiber.Map{"error": "รหัส OTP หมดอายุหรือไม่ถูกต้อง"})
 	} else if err != nil {
 		log.Println("❌ ดึงข้อมูล Redis ล้มเหลว:", err)
@@ -104,24 +165,25 @@ func VerifyOTP(c *fiber.Ctx) error {
 	if _, err := rand.Read(b); err != nil {
 		log.Println("❌ สุ่ม Token ล้มเหลว:", err)
 	}
-	sessionToken := fmt.Sprintf("up_sess_%s", hex.EncodeToString(b))
+	sessionToken := fmt.Sprintf("%s%s", getSessionTokenPrefix(), hex.EncodeToString(b))
+	sessionDuration := getSessionDuration()
 
-	// บันทึก Session Token ลง Redis มีอายุ 7 วัน
+	// บันทึก Session Token ลง Redis
 	redisSessionKey := fmt.Sprintf("upmatch:session:%s", sessionToken)
-	config.RedisClient.Set(config.Ctx, redisSessionKey, cleanEmail, 7*24*time.Hour)
+	config.RedisClient.Set(config.Ctx, redisSessionKey, cleanEmail, sessionDuration)
 
-	// บันทึก Cookie ให้ทั้ง up_match_token และ upmatch_email
+	// บันทึก Cookie ตามชื่อที่คอนฟิกใน .env
 	c.Cookie(&fiber.Cookie{
-		Name:     "up_match_token",
+		Name:     getSessionCookieName(),
 		Value:    sessionToken,
-		Expires:  time.Now().Add(7 * 24 * time.Hour),
+		Expires:  time.Now().Add(sessionDuration),
 		HTTPOnly: false,
 		SameSite: "Lax",
 	})
 	c.Cookie(&fiber.Cookie{
-		Name:     "upmatch_email",
+		Name:     getEmailCookieName(),
 		Value:    cleanEmail,
-		Expires:  time.Now().Add(7 * 24 * time.Hour),
+		Expires:  time.Now().Add(sessionDuration),
 		HTTPOnly: false,
 		SameSite: "Lax",
 	})

@@ -33,7 +33,7 @@ const isGifOrImageUrl = (text) => {
   );
 };
 
-const GIPHY_API_KEY = "sXpGFDGZs0Dv1mmNFvYaGUvYwKX0PWIh";
+const GIPHY_API_KEY = process.env.NEXT_PUBLIC_GIPHY_API_KEY || "sXpGFDGZs0Dv1mmNFvYaGUvYwKX0PWIh";
 
 const GIF_CATEGORIES = [
   { id: "trending", label: "🔥 ยอดฮิต", query: "" },

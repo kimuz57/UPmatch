@@ -6,9 +6,11 @@
  */
 export function getSessionSignature(token) {
   if (!token) return "";
+  const secret = process.env.NEXT_PUBLIC_SESSION_SECRET || "";
+  const combined = secret ? `${secret}:${token}` : token;
   let h1 = 0xdeadbeef, h2 = 0x41c6ce57;
-  for (let i = 0; i < token.length; i++) {
-    const ch = token.charCodeAt(i);
+  for (let i = 0; i < combined.length; i++) {
+    const ch = combined.charCodeAt(i);
     h1 = Math.imul(h1 ^ ch, 2654435761);
     h2 = Math.imul(h2 ^ ch, 1597334677);
   }

@@ -5,6 +5,7 @@ import (
 	"log"
 	"net/http"
 	"os"
+	"strconv"
 	"strings"
 	"upmatch-backend/config"
 	"upmatch-backend/models"
@@ -37,6 +38,13 @@ func SendWebPushToUser(targetEmail string, payload PushPayload) {
 		return
 	}
 
+	ttl := 86400
+	if ttlStr := os.Getenv("WEBPUSH_TTL"); ttlStr != "" {
+		if t, err := strconv.Atoi(ttlStr); err == nil && t > 0 {
+			ttl = t
+		}
+	}
+
 	var subs []models.PushSubscription
 	if err := config.DB.Where("LOWER(email) = ?", cleanEmail).Find(&subs).Error; err != nil || len(subs) == 0 {
 		return
@@ -47,7 +55,7 @@ func SendWebPushToUser(targetEmail string, payload PushPayload) {
 		return
 	}
 
-	go func(subscriptions []models.PushSubscription, payloadBytes []byte) {
+	go func(subscriptions []models.PushSubscription, payloadBytes []byte, pushTTL int) {
 		for _, sub := range subscriptions {
 			s := &webpush.Subscription{
 				Endpoint: sub.Endpoint,
@@ -61,7 +69,7 @@ func SendWebPushToUser(targetEmail string, payload PushPayload) {
 				Subscriber:      vapidSubject,
 				VAPIDPublicKey:  vapidPublic,
 				VAPIDPrivateKey: vapidPrivate,
-				TTL:             86400, // 24 ชั่วโมง
+				TTL:             pushTTL,
 				Urgency:         webpush.UrgencyHigh,
 			})
 
@@ -75,5 +83,5 @@ func SendWebPushToUser(targetEmail string, payload PushPayload) {
 				}
 			}
 		}
-	}(subs, jsonBytes)
+	}(subs, jsonBytes, ttl)
 }

@@ -7,10 +7,11 @@ const nextConfig: NextConfig = {
     "localhost:3003",
     "127.0.0.1",
     "127.0.0.1:3003",
-    "192.168.1.109",
-    "192.168.1.109:3003",
-    "192.168.1.*",
+    "192.168.*",
     "*.local",
+    ...(process.env.ALLOWED_DEV_ORIGINS
+      ? process.env.ALLOWED_DEV_ORIGINS.split(",").map((s) => s.trim()).filter(Boolean)
+      : []),
   ],
   experimental: {
     agentFeedback: true,
@@ -25,16 +26,17 @@ const nextConfig: NextConfig = {
       },
     },
   },
-  // เพิ่มส่วนนี้เพื่อส่งต่อ Request ไปยัง Go Fiber (พอร์ต 8080)
+  // ส่งต่อ Request ไปยัง Go Fiber ตามค่าที่ตั้งไว้ใน .env
   async rewrites() {
+    const backendUrl = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8081";
     return [
       {
         source: "/api/v1/:path*",
-        destination: "http://localhost:8080/api/v1/:path*",
+        destination: `${backendUrl}/api/v1/:path*`,
       },
       {
         source: "/uploads/:path*",
-        destination: "http://localhost:8080/uploads/:path*",
+        destination: `${backendUrl}/uploads/:path*`,
       },
     ];
   },

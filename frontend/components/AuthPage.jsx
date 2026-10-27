@@ -76,7 +76,7 @@ export default function AuthPage({ onLoginSuccess, onBack }) {
       setStep("otp");
     } catch (err) {
       setErrorMsg(
-        err.message || "เชื่อมต่อเซิร์ฟเวอร์ Go (พอร์ต 8080) ไม่สำเร็จ",
+        err.message || "เชื่อมต่อเซิร์ฟเวอร์ Backend ไม่สำเร็จ กรุณาตรวจสอบการเชื่อมต่อ",
       );
     } finally {
       setLoading(false);

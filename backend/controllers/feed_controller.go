@@ -15,7 +15,12 @@ import (
 	"github.com/gofiber/fiber/v2"
 )
 
-const defaultAvatar = "https://images.unsplash.com/photo-1517841905240-472988babdf9?auto=format&fit=crop&w=800&q=80"
+func getDefaultAvatar() string {
+	if avatar := os.Getenv("DEFAULT_AVATAR_URL"); avatar != "" {
+		return avatar
+	}
+	return "https://images.unsplash.com/photo-1517841905240-472988babdf9?auto=format&fit=crop&w=800&q=80"
+}
 
 // โครงสร้างข้อมูลโปรไฟล์ที่ดึงจาก Database
 type profileRow struct {
@@ -150,14 +155,11 @@ func normalizePreference(p string) string {
 
 func formatImageURL(path string) string {
 	if path == "" {
-		return defaultAvatar
+		return getDefaultAvatar()
 	}
-	// ถ้ามี localhost:8080 หรือ 127.0.0.1:8080 ติดมา ให้ตัดออกเป็น relative path
-	if strings.HasPrefix(path, "http://localhost:8080/") {
-		return strings.TrimPrefix(path, "http://localhost:8080")
-	}
-	if strings.HasPrefix(path, "http://127.0.0.1:8080/") {
-		return strings.TrimPrefix(path, "http://127.0.0.1:8080")
+	// ถ้ามี domain หรือ localhost พ่วงมากับ /uploads ให้ตัดออกเป็น relative path
+	if idx := strings.Index(path, "/uploads/"); idx != -1 {
+		return path[idx:]
 	}
 	if strings.HasPrefix(path, "http://") || strings.HasPrefix(path, "https://") {
 		return path
@@ -170,7 +172,7 @@ func formatImageURL(path string) string {
 
 func firstImageURL(images []models.UserImage) string {
 	if len(images) == 0 {
-		return defaultAvatar
+		return getDefaultAvatar()
 	}
 	main := images[0]
 	for _, img := range images {
@@ -181,7 +183,7 @@ func firstImageURL(images []models.UserImage) string {
 	}
 	path := main.ImageURL
 	if path == "" {
-		return defaultAvatar
+		return getDefaultAvatar()
 	}
 	check := path
 	if !filepath.IsAbs(check) {
