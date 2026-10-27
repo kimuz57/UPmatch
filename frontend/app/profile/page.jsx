@@ -24,6 +24,7 @@ import {
   Mail,
   Copy,
   ExternalLink,
+  Globe,
 } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { getApiBaseUrl, formatImageUrl } from "@/utils/api";
@@ -1180,7 +1181,7 @@ export default function ProfilePage() {
                   <h2 className="text-sm sm:text-base font-black text-slate-900">
                     ติดต่อผู้พัฒนา
                   </h2>
-                  <p className="text-[11px] text-slate-500 font-medium">UP Match Student Developer</p>
+                  <p className="text-[11px] text-purple-900 font-semibold">Suphakit Saeyang (ศุภกิตต์ แซ่ย่าง)</p>
                 </div>
               </div>
               <button
@@ -1193,6 +1194,24 @@ export default function ProfilePage() {
             </div>
 
             <div className="space-y-3">
+              {/* Portfolio */}
+              <a
+                href="https://tcmg.me"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="p-3 rounded-xl bg-purple-50/70 border border-purple-200 flex items-center justify-between hover:bg-purple-100/80 transition cursor-pointer group"
+              >
+                <div className="flex items-center gap-2.5">
+                  <div className="w-7 h-7 rounded-lg bg-purple-100 text-purple-900 flex items-center justify-center shrink-0">
+                    <Globe className="w-4 h-4" />
+                  </div>
+                  <div>
+                    <span className="text-[11px] font-bold text-purple-900 block">Portfolio ผู้พัฒนา</span>
+                    <span className="text-xs sm:text-sm font-bold text-slate-900 group-hover:text-purple-950">tcmg.me</span>
+                  </div>
+                </div>
+                <ExternalLink className="w-4 h-4 text-purple-800 group-hover:text-purple-950 transition" />
+              </a>
               {/* Email */}
               <div className="p-3 rounded-xl bg-slate-50 border border-slate-200">
                 <div className="flex items-center justify-between mb-1">

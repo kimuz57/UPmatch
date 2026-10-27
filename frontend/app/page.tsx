@@ -4,6 +4,7 @@
 
 import React, { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
+import Link from "next/link";
 import {
   HeartHandshake,
   ShieldCheck,
@@ -160,7 +161,26 @@ export default function LandingPage() {
           </p>
 
           <div className="pt-2 border-t border-slate-200/60 flex flex-wrap items-center justify-center gap-x-3 sm:gap-x-4 gap-y-1.5 text-[11px] text-slate-600">
-            <span className="font-semibold text-slate-700">ติดต่อผู้พัฒนา:</span>
+            <Link
+              href="/about"
+              className="text-purple-900 hover:text-purple-950 font-bold hover:underline"
+            >
+              เกี่ยวกับ UPmatch
+            </Link>
+            <span className="text-slate-300">•</span>
+            <span>
+              พัฒนาโดย{" "}
+              <a
+                href="https://tcmg.me"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="font-bold text-purple-900 hover:text-purple-950 hover:underline"
+              >
+                Suphakit Saeyang
+              </a>
+            </span>
+            <span className="text-slate-300">•</span>
+            <span className="font-semibold text-slate-700">ติดต่อ:</span>
             <a
               href="mailto:67024942@up.ac.th"
               className="text-purple-900 hover:text-purple-950 hover:underline font-medium"
@@ -183,12 +203,12 @@ export default function LandingPage() {
               rel="noopener noreferrer"
               className="text-purple-900 hover:text-purple-950 hover:underline font-medium"
             >
-              Facebook Profile
+              Facebook
             </a>
           </div>
 
           <p className="text-[10px] text-slate-400 pt-1">
-            © 2026 UP Match Student Project. All rights reserved.
+            © 2026 UPmatch Student Project. Developed by Suphakit Saeyang. All rights reserved.
           </p>
         </div>
       </footer>

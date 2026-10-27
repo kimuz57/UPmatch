@@ -22,7 +22,7 @@ export const metadata: Metadata = {
   description:
     "UPmatch แพลตฟอร์มหาคู่สำหรับนิสิตมหาวิทยาลัยพะเยา หาเพื่อน หาแฟน และหาคนคุย พร้อมดูคนที่กดไลก์และแมตช์กันได้ฟรี",
   applicationName: "UPmatch",
-  authors: [{ name: "UPmatch Student Project" }],
+  authors: [{ name: "Suphakit Saeyang", url: "https://tcmg.me" }],
   generator: "Next.js",
   keywords: [
     "UPmatch",
@@ -38,10 +38,12 @@ export const metadata: Metadata = {
     "มหาวิทยาลัยพะเยา",
     "นิสิต ม.พะเยา",
     "UP dating",
+    "Suphakit Saeyang",
+    "ศุภกิตต์ แซ่ย่าง",
   ],
   referrer: "origin-when-cross-origin",
-  creator: "UPmatch Student Project",
-  publisher: "UPmatch",
+  creator: "Suphakit Saeyang",
+  publisher: "Suphakit Saeyang",
   formatDetection: {
     email: false,
     address: false,
@@ -119,6 +121,17 @@ export default function RootLayout({
         url: siteUrl,
         applicationCategory: "SocialNetworkingApplication",
         operatingSystem: "All",
+        author: {
+          "@type": "Person",
+          "@id": "https://tcmg.me/#person",
+          name: "Suphakit Saeyang",
+          alternateName: "ศุภกิตต์ แซ่ย่าง",
+          url: "https://tcmg.me",
+        },
+        creator: {
+          "@type": "Person",
+          "@id": "https://tcmg.me/#person",
+        },
         offers: {
           "@type": "Offer",
           price: "0",
@@ -126,6 +139,20 @@ export default function RootLayout({
         },
         description:
           "เว็บหาคู่ ม.พะเยา ฟรี สำหรับนิสิต ค้นหาเพื่อนใหม่ คนรู้ใจ และคอมมูนิตี้เด็ก มพ. ปลอดภัยด้วยอีเมล @up.ac.th",
+      },
+      {
+        "@type": "Person",
+        "@id": "https://tcmg.me/#person",
+        name: "Suphakit Saeyang",
+        alternateName: ["ศุภกิตต์ แซ่ย่าง", "kitdhgiiob"],
+        url: "https://tcmg.me",
+        jobTitle: "Software Developer",
+        sameAs: [
+          "https://tcmg.me",
+          "https://instagram.com/kitdhgiiob",
+          "https://www.facebook.com/profile.php?id=100070998043139",
+          "https://github.com/kimuz57",
+        ],
       },
     ],
   };
