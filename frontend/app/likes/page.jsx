@@ -11,7 +11,6 @@ import {
   Eye,
   Copy,
   CheckCheck,
-  Share2,
   MessageCircle,
   X,
   UserCheck,
@@ -99,14 +98,6 @@ export default function LikesPage() {
     navigator.clipboard.writeText(inviteUrl);
     setCopied(true);
     setTimeout(() => setCopied(false), 2500);
-  };
-
-  const handleShareLine = () => {
-    if (!inviteUrl) return;
-    const text = encodeURIComponent(
-      `มาเล่น UP Match ด้วยกันสิ! แพลตฟอร์มหาเพื่อนใหม่นิสิต ม.พะเยา: ${inviteUrl}`
-    );
-    window.open(`https://line.me/R/msg/text/?${text}`, "_blank");
   };
 
   // กดแมตช์คนที่มาไลก์เราทันที (สำหรับผู้ใช้ PRO)
@@ -299,61 +290,46 @@ export default function LikesPage() {
             initial={{ scale: 0.96, opacity: 0 }}
             animate={{ scale: 1, opacity: 1 }}
             transition={{ duration: 0.18 }}
-            className="p-6 sm:p-7 bg-white rounded-2xl border border-slate-200 shadow-xl max-w-md w-full text-center space-y-5 relative z-50"
+            className="p-6 sm:p-8 bg-white rounded-2xl sm:rounded-3xl border border-slate-200 shadow-xl max-w-md w-full text-center space-y-4 sm:space-y-5 relative z-50"
           >
-            {/* Header Badge & Title */}
+            {/* Header Title & Description (Larger on Mobile) */}
             <div>
-              <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-purple-50 text-purple-900 border border-purple-200 text-xs font-bold tracking-wide mb-3">
-                <Users className="w-3.5 h-3.5 text-purple-800" />
-                <span>UP MATCH PRO</span>
-              </span>
-
-              <h2 className="text-lg sm:text-xl font-black text-slate-900 tracking-tight">
+              <h2 className="text-xl sm:text-2xl font-black text-slate-900 tracking-tight leading-snug">
                 ชวนเพื่อน 1 คนเพื่อปลดล็อกเป็น PRO ถาวร
               </h2>
-              <p className="text-xs text-slate-600 mt-2 leading-relaxed">
+              <p className="text-sm sm:text-base text-slate-600 mt-2.5 sm:mt-3 leading-relaxed">
                 ส่งลิงก์ด้านล่างเพื่อชวนเพื่อน 1 คน เมื่อเพื่อนสมัครสำเร็จ ระบบจะอัปเกรดบัญชีของคุณเป็น PRO ทันที คุณสามารถกดแมตช์ได้ทุกคน
               </p>
             </div>
 
-            {/* Referral Link Box */}
-            <div className="space-y-2.5">
-              <div className="flex items-center gap-2 p-1.5 bg-slate-50 border border-slate-200 rounded-xl">
+            {/* Referral Link & Prominent Copy Button */}
+            <div className="space-y-3 pt-1">
+              <div className="p-2 sm:p-2.5 bg-slate-50 border border-slate-200 rounded-xl">
                 <input
                   type="text"
                   readOnly
                   value={inviteUrl || "กำลังสร้างลิงก์ชวนเพื่อน..."}
-                  className="flex-1 bg-transparent text-xs text-slate-800 font-mono px-2.5 py-1.5 outline-none select-all truncate"
+                  className="w-full bg-transparent text-xs sm:text-sm text-slate-700 font-mono px-2 py-1 outline-none select-all text-center truncate"
                 />
-                <button
-                  type="button"
-                  onClick={handleCopyLink}
-                  disabled={!inviteUrl}
-                  className="px-3.5 py-1.5 rounded-lg bg-purple-900 hover:bg-purple-950 active:scale-[0.98] text-white font-bold text-xs shadow-xs transition flex items-center gap-1.5 cursor-pointer shrink-0 disabled:opacity-50"
-                >
-                  {copied ? (
-                    <>
-                      <CheckCheck className="w-3.5 h-3.5" />
-                      <span>คัดลอกแล้ว</span>
-                    </>
-                  ) : (
-                    <>
-                      <Copy className="w-3.5 h-3.5" />
-                      <span>คัดลอกลิงก์</span>
-                    </>
-                  )}
-                </button>
               </div>
 
-              {/* Share to LINE Button */}
               <button
                 type="button"
-                onClick={handleShareLine}
+                onClick={handleCopyLink}
                 disabled={!inviteUrl}
-                className="w-full py-2.5 px-4 rounded-xl bg-[#06C755] hover:bg-[#05b34c] active:scale-[0.98] text-white font-bold text-xs shadow-xs transition flex items-center justify-center gap-2 cursor-pointer disabled:opacity-50"
+                className="w-full py-3.5 sm:py-4 px-5 rounded-xl bg-purple-900 hover:bg-purple-950 active:scale-[0.98] text-white font-bold text-sm sm:text-base shadow-xs transition flex items-center justify-center gap-2 cursor-pointer disabled:opacity-50"
               >
-                <Share2 className="w-4 h-4" />
-                <span>แชร์ไปยัง LINE ให้เพื่อนสมัคร</span>
+                {copied ? (
+                  <>
+                    <CheckCheck className="w-5 h-5 text-white" />
+                    <span>คัดลอกลิงก์เรียบร้อยแล้ว</span>
+                  </>
+                ) : (
+                  <>
+                    <Copy className="w-5 h-5" />
+                    <span>คัดลอกลิงก์</span>
+                  </>
+                )}
               </button>
             </div>
           </motion.div>
