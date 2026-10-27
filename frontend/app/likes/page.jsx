@@ -3,7 +3,7 @@
 
 import React, { useState, useEffect } from "react";
 import Navbar from "@/components/Navbar";
-import { Sparkles, Users, PlaySquare, Loader2, Heart } from "lucide-react";
+import { Users, PlaySquare, Loader2, Heart, Eye } from "lucide-react";
 import { motion } from "framer-motion";
 import { getApiBaseUrl, formatImageUrl } from "@/utils/api";
 
@@ -60,48 +60,58 @@ export default function LikesPage() {
       setAdPlaying(false);
       setIsUnlocked(true);
       localStorage.setItem("upmatch_likes_unlocked", "true");
-      alert("ปลดล็อกเรียบร้อย! คุณสามารถดูและกดแมตช์คนที่มาไลก์คุณได้ 5 คน 🎉");
+      alert("ปลดล็อกเรียบร้อย คุณสามารถดูและกดแมตช์คนที่มาไลก์คุณได้ 5 คน");
     }, 5000);
   };
 
   return (
-    <div className="h-dvh max-h-screen bg-transparent text-slate-800 flex flex-col overflow-hidden">
+    <div className="h-dvh max-h-screen bg-slate-50 text-slate-800 flex flex-col overflow-hidden">
       <div className="shrink-0 z-30">
         <Navbar />
       </div>
-      <main className="flex-1 min-h-0 overflow-y-auto max-w-5xl mx-auto w-full px-3.5 sm:px-6 py-3 sm:py-6 page-bottom-padding">
+      <main className="flex-1 min-h-0 overflow-y-auto max-w-5xl mx-auto w-full px-3.5 sm:px-6 py-4 sm:py-6 page-bottom-padding">
         
-        <div className="mb-6 sm:mb-8 text-center">
-          <div className="inline-flex items-center justify-center p-2.5 sm:p-3 bg-pink-100 rounded-full mb-2 sm:mb-3 shadow-xs border border-pink-200">
-            <Sparkles className="w-6 h-6 sm:w-8 sm:h-8 text-pink-500" />
+        {/* Clean Editorial Header */}
+        <div className="mb-6 flex flex-col sm:flex-row sm:items-center justify-between gap-2 border-b border-slate-200 pb-4">
+          <div className="flex items-center gap-3">
+            <div className="w-10 h-10 rounded-xl bg-purple-100 text-purple-900 flex items-center justify-center shrink-0">
+              <Eye className="w-5 h-5" />
+            </div>
+            <div>
+              <h1 className="text-xl sm:text-2xl font-black text-slate-900">คนที่แอบชอบคุณ</h1>
+              <p className="text-xs text-slate-500 font-medium">
+                มีนิสิตส่งใจให้คุณทั้งหมด {whoLikesMe.length} คน
+              </p>
+            </div>
           </div>
-          <h1 className="text-xl sm:text-2xl font-black text-slate-800">คนที่แอบชอบคุณ</h1>
-          <p className="text-xs sm:text-sm font-bold text-pink-500 mt-1">
-            มีคนส่งใจให้คุณทั้งหมด {whoLikesMe.length} คน
-          </p>
+          {whoLikesMe.length > 0 && !isUnlocked && (
+            <span className="self-start sm:self-auto text-xs px-2.5 py-1 rounded-md bg-purple-50 text-purple-900 font-semibold border border-purple-200">
+              สถานะ: ซ่อนรูปภาพ
+            </span>
+          )}
         </div>
 
         {loading ? (
           <div className="flex flex-col items-center justify-center py-20">
-            <Loader2 className="w-8 h-8 animate-spin text-pink-400 mb-2" />
-            <p className="text-sm text-pink-500 font-bold">กำลังโหลดข้อมูลคนแอบชอบ...</p>
+            <Loader2 className="w-8 h-8 animate-spin text-purple-800 mb-2" />
+            <p className="text-xs text-slate-600 font-semibold">กำลังโหลดข้อมูลคนแอบชอบ...</p>
           </div>
         ) : whoLikesMe.length === 0 ? (
           <div className="flex flex-col items-center justify-center py-20 text-center">
-            <div className="w-16 h-16 bg-purple-100 rounded-full flex items-center justify-center mb-3">
-              <Heart className="w-8 h-8 text-purple-300" />
+            <div className="w-14 h-14 bg-purple-100 rounded-xl flex items-center justify-center mb-3 text-purple-800">
+              <Heart className="w-7 h-7" />
             </div>
-            <p className="text-slate-500 font-medium text-sm">ยังไม่มีคนแอบชอบคุณตอนนี้<br/>ลองไปปัดเพื่อนๆ เพิ่มดูสิ!</p>
+            <p className="text-slate-600 font-medium text-sm">ยังไม่มีคนแอบชอบคุณในขณะนี้<br/>ลองไปปัดเพื่อนๆ เพิ่มดูสิ</p>
           </div>
         ) : (
           <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-3 sm:gap-4">
             {whoLikesMe.map((liker, idx) => (
               <motion.div 
-                initial={{ opacity: 0, scale: 0.9 }} 
+                initial={{ opacity: 0, scale: 0.95 }} 
                 animate={{ opacity: 1, scale: 1 }} 
-                transition={{ delay: idx * 0.1 }}
+                transition={{ delay: idx * 0.05 }}
                 key={idx} 
-                className="relative aspect-[3/4] rounded-2xl overflow-hidden shadow-md border border-purple-100 bg-white"
+                className="relative aspect-[3/4] rounded-xl overflow-hidden shadow-xs border border-slate-200 bg-white"
               >
                 <img 
                   src={formatImageUrl(liker.image)} 
@@ -109,16 +119,15 @@ export default function LikesPage() {
                   className={`w-full h-full object-cover transition duration-300 ${!isUnlocked ? 'blur-2xl scale-110' : ''}`}
                 />
                 
-                {/* ถ้ายังไม่ปลดล็อก ให้แสดงแม่กุญแจทับรูป */}
                 {!isUnlocked && (
-                  <div className="absolute inset-0 flex items-center justify-center bg-pink-500/20 mix-blend-overlay">
-                    <Heart className="w-10 h-10 text-white opacity-80" />
+                  <div className="absolute inset-0 flex items-center justify-center bg-slate-900/30">
+                    <Heart className="w-8 h-8 text-white opacity-80" />
                   </div>
                 )}
 
-                <div className="absolute bottom-0 left-0 w-full p-3 bg-gradient-to-t from-black/80 to-transparent">
-                  <p className="text-white font-bold text-sm truncate w-full drop-shadow-md">
-                    {isUnlocked ? liker.name : "ความลับ 🤫"}
+                <div className="absolute bottom-0 left-0 w-full p-3 bg-gradient-to-t from-slate-950/80 to-transparent">
+                  <p className="text-white font-bold text-xs truncate w-full drop-shadow-xs">
+                    {isUnlocked ? liker.name : "ซ่อนโปรไฟล์"}
                   </p>
                 </div>
               </motion.div>
@@ -126,30 +135,32 @@ export default function LikesPage() {
           </div>
         )}
 
-        {/* ================= กรอบโฆษณา/ปลดล็อก (ถ้ายังไม่ปลดล็อก และมีคนไลก์) ================= */}
+        {/* Ad Unlock Banner */}
         {!isUnlocked && whoLikesMe.length > 0 && (
-          <div className="mt-8 p-6 bg-white/90 backdrop-blur-md rounded-3xl border border-pink-200 shadow-xl max-w-lg mx-auto text-center">
-            <h3 className="text-lg font-black text-slate-800 mb-2">ปลดล็อกเพื่อดูว่าใครชอบคุณ 👀</h3>
-            <p className="text-sm text-slate-500 mb-6">คุณจะได้รับสิทธิ์กดไลก์กลับและแมตช์ได้ทันทีสูงสุด 5 คน</p>
+          <div className="mt-8 p-6 bg-white rounded-2xl border border-slate-200 shadow-xs max-w-lg mx-auto text-center space-y-4">
+            <div>
+              <h2 className="text-base font-black text-slate-900">ปลดล็อกเพื่อดูว่าใครแอบชอบคุณ</h2>
+              <p className="text-xs text-slate-600 mt-1">คุณจะได้รับสิทธิ์กดไลก์กลับและแมตช์ได้ทันทีสูงสุด 5 คน</p>
+            </div>
             
             {adPlaying ? (
-              <div className="w-full py-4 rounded-2xl bg-slate-800 flex flex-col items-center justify-center text-white space-y-2">
-                <Loader2 className="w-6 h-6 animate-spin text-pink-400" />
-                <span className="text-sm font-bold">กำลังเล่นวิดีโอโฆษณา... (5 วินาที)</span>
+              <div className="w-full py-4 rounded-xl bg-slate-900 flex flex-col items-center justify-center text-white space-y-2">
+                <Loader2 className="w-5 h-5 animate-spin text-purple-300" />
+                <span className="text-xs font-semibold">กำลังเล่นวิดีโอโฆษณา... (5 วินาที)</span>
               </div>
             ) : (
-              <div className="space-y-3">
+              <div className="space-y-2.5">
                 <button 
-                  onClick={() => alert("ระบบแชร์ลิงก์ให้เพื่อน (เตรียมพร้อมพัฒนา)")}
-                  className="w-full py-4 rounded-2xl bg-purple-100 text-purple-700 font-bold text-sm shadow-sm flex items-center justify-center gap-2 hover:bg-purple-200 transition cursor-pointer"
+                  onClick={() => alert("ระบบแชร์ลิงก์ให้เพื่อนกำลังพัฒนา")}
+                  className="w-full py-3 rounded-xl bg-purple-50 text-purple-900 font-bold text-xs border border-purple-200 hover:bg-purple-100 transition cursor-pointer flex items-center justify-center gap-2"
                 >
-                  <Users className="w-5 h-5" /> ชวนเพื่อน 3 คน (ใช้งานฟรีถาวร)
+                  <Users className="w-4 h-4" /> ชวนเพื่อน 3 คน (ใช้งานฟรี)
                 </button>
                 <button 
                   onClick={watchAdToUnlock}
-                  className="w-full py-4 rounded-2xl bg-gradient-to-r from-pink-500 to-purple-500 text-white font-black text-sm shadow-lg hover:opacity-90 transition flex items-center justify-center gap-2 cursor-pointer"
+                  className="w-full py-3 rounded-xl bg-rose-600 hover:bg-rose-700 text-white font-bold text-xs shadow-xs transition flex items-center justify-center gap-2 cursor-pointer"
                 >
-                  <PlaySquare className="w-5 h-5" /> ดูโฆษณาสั้นๆ ปลดล็อกทันที
+                  <PlaySquare className="w-4 h-4" /> ดูโฆษณาสั้นๆ เพื่อปลดล็อก
                 </button>
               </div>
             )}

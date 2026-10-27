@@ -1,22 +1,19 @@
 import type { Metadata } from "next";
-import { Geist, Geist_Mono } from "next/font/google";
+import { Prompt } from "next/font/google";
 import "./globals.css";
 import GlobalNotification from "@/components/GlobalNotification";
 import FloatingHeartsBackground from "@/components/FloatingHeartsBackground";
 
-const geistSans = Geist({
-  variable: "--font-geist-sans",
-  subsets: ["latin"],
-});
-
-const geistMono = Geist_Mono({
-  variable: "--font-geist-mono",
-  subsets: ["latin"],
+const promptFont = Prompt({
+  weight: ["400", "500", "600", "700", "800"],
+  subsets: ["thai", "latin"],
+  variable: "--font-prompt",
+  display: "swap",
 });
 
 export const metadata: Metadata = {
-  title: "UP Match - แอปหาเพื่อน มหาวิทยาลัยพะเยา",
-  description: "ค้นหาเพื่อนใหม่ คนรู้ใจ และคอมมูนิตี้เด็ก มพ.",
+  title: "UP Match - คอมมูนิตี้สำหรับนิสิต มหาวิทยาลัยพะเยา",
+  description: "ค้นหาเพื่อนใหม่ คนรู้ใจ และคอมมูนิตี้เด็ก ม.พะเยา ปลอดภัยด้วยอีเมล @up.ac.th",
 };
 
 export default function RootLayout({
@@ -27,12 +24,12 @@ export default function RootLayout({
   return (
     <html
       lang="th"
-      className={`${geistSans.variable} ${geistMono.variable} min-h-full antialiased`}
+      className={`${promptFont.variable} min-h-full antialiased font-sans`}
       suppressHydrationWarning
     >
       <head>
         <link rel="manifest" href="/manifest.json" />
-        <meta name="theme-color" content="#9333ea" />
+        <meta name="theme-color" content="#581c87" />
         <meta name="apple-mobile-web-app-capable" content="yes" />
         <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
         <meta name="apple-mobile-web-app-title" content="UP Match" />
@@ -45,11 +42,7 @@ export default function RootLayout({
                   try {
                     var w = window.innerWidth;
                     var h = window.innerHeight;
-                    // แนวนอนเมื่อความกว้างมากกว่าความสูง (หรือ orientation landscape)
                     var isLandscape = (w > h) || (window.matchMedia && window.matchMedia('(orientation: landscape)').matches);
-                    
-                    // คอมพิวเตอร์ หรือ iPad แนวนอน: กว้าง >= 1024px และเป็นแนวนอน (หรือจอใหญ่ >= 1360px)
-                    // มือถือ หรือ iPad แนวตั้ง: กว้าง < 1200px ในแนวตั้ง (w <= h)
                     var isDesktop = (w >= 1024 && isLandscape) || (w >= 1360);
                     
                     if (isDesktop) {
@@ -69,7 +62,7 @@ export default function RootLayout({
           }}
         />
       </head>
-      <body className="min-h-full flex flex-col bg-gradient-to-br from-purple-50 via-white to-pink-50 text-slate-800 relative selection:bg-purple-200">
+      <body className="min-h-full flex flex-col bg-slate-50 text-slate-900 relative selection:bg-purple-200">
         <FloatingHeartsBackground />
         <GlobalNotification />
         {children}

@@ -2,21 +2,17 @@
 "use client";
 
 import React, { useState, useMemo } from "react";
-import { motion } from "framer-motion";
 import {
   Mail,
   ShieldCheck,
   Send,
-  CheckCircle2,
   AlertCircle,
   HeartHandshake,
   Loader2,
   ArrowLeft,
-  Heart,
 } from "lucide-react";
 import { parseStudentEmail } from "../utils/emailParser";
 import { getApiBaseUrl } from "../utils/api";
-
 
 export default function AuthPage({ onLoginSuccess, onBack }) {
   const [step, setStep] = useState("email"); // 'email' | 'otp'
@@ -35,11 +31,9 @@ export default function AuthPage({ onLoginSuccess, onBack }) {
 
   const handleStudentIdChange = (e) => {
     let val = e.target.value.trim();
-    // ถ้าผู้ใช้เผลอก็อปปี้อีเมลเต็มๆ มาแปะ เช่น 67021589@up.ac.th ให้ตัดเหลือเฉพาะรหัสนิสิต
     if (val.includes("@")) {
       val = val.split("@")[0];
     }
-    // รับเฉพาะตัวเลข และจำกัดความยาวไม่เกิน 8 หลัก
     val = val.replace(/\D/g, "").slice(0, 8);
     setStudentId(val);
   };
@@ -76,7 +70,7 @@ export default function AuthPage({ onLoginSuccess, onBack }) {
       setStep("otp");
     } catch (err) {
       setErrorMsg(
-        err.message || "เชื่อมต่อเซิร์ฟเวอร์ Backend ไม่สำเร็จ กรุณาตรวจสอบการเชื่อมต่อ",
+        err.message || "เชื่อมต่อเซิร์ฟเวอร์ไม่สำเร็จ กรุณาตรวจสอบการเชื่อมต่อ",
       );
     } finally {
       setLoading(false);
@@ -110,14 +104,12 @@ export default function AuthPage({ onLoginSuccess, onBack }) {
 
       const cleanEmail = email.trim().toLowerCase();
 
-      // ✅ บันทึก Unique Session Token และ Email ลง Cookie
       const sessionToken = data.token;
       if (sessionToken) {
         document.cookie = `up_match_token=${sessionToken}; path=/; max-age=604800; SameSite=Lax`;
       }
       document.cookie = `upmatch_email=${cleanEmail}; path=/; max-age=604800; SameSite=Lax`;
 
-      // ส่งต่อไปหน้า Onboarding
       if (onLoginSuccess) {
         onLoginSuccess(data.user);
       } else {
@@ -131,16 +123,15 @@ export default function AuthPage({ onLoginSuccess, onBack }) {
   };
 
   return (
-    <div className="min-h-screen bg-transparent text-slate-800 flex items-center justify-center p-4 py-8 relative overflow-y-auto overflow-x-hidden">
-
-
-      {/* การ์ด Glassmorphism */}
-      <div className="max-w-md w-full bg-white/85 sm:bg-white/70 backdrop-blur-xl border border-white/50 rounded-3xl p-5 sm:p-9 space-y-5 sm:space-y-6 shadow-xl shadow-purple-100 relative z-10">
+    <div className="min-h-screen bg-slate-50 text-slate-800 flex items-center justify-center p-4 py-8 relative overflow-y-auto overflow-x-hidden">
+      
+      {/* Crisp Solid Card */}
+      <div className="max-w-md w-full bg-white border border-slate-200 rounded-2xl p-6 sm:p-8 space-y-6 shadow-sm relative z-10">
         {onBack && (
           <button
             type="button"
             onClick={onBack}
-            className="inline-flex items-center gap-1.5 text-xs font-bold text-purple-600 hover:text-purple-800 transition cursor-pointer"
+            className="inline-flex items-center gap-1.5 text-xs font-bold text-slate-600 hover:text-purple-900 transition cursor-pointer"
           >
             <ArrowLeft className="w-4 h-4" />
             <span>กลับหน้าหลัก</span>
@@ -149,48 +140,48 @@ export default function AuthPage({ onLoginSuccess, onBack }) {
 
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-2.5">
-            <div className="w-10 h-10 rounded-2xl bg-gradient-to-tr from-purple-400 to-pink-400 flex items-center justify-center text-white shadow-md shadow-purple-200">
+            <div className="w-10 h-10 rounded-xl bg-purple-900 flex items-center justify-center text-white shadow-xs">
               <HeartHandshake className="w-5 h-5" />
             </div>
             <div>
-              <span className="text-xl font-extrabold tracking-tight text-slate-800">
+              <span className="text-xl font-black tracking-tight text-slate-900">
                 UP Match
               </span>
-              <span className="block text-[10px] font-bold text-purple-500">
-                คอมมูนิตี้ชาว ม.พะเยา
+              <span className="block text-[10px] font-bold text-purple-800">
+                มหาวิทยาลัยพะเยา
               </span>
             </div>
           </div>
 
-          <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-purple-50 border border-purple-100 text-purple-700 text-xs font-bold">
-            <ShieldCheck className="w-4 h-4 text-purple-500" />
-            <span>@up.ac.th เท่านั้น</span>
+          <div className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-md bg-purple-50 border border-purple-200 text-purple-900 text-xs font-bold">
+            <ShieldCheck className="w-3.5 h-3.5 text-purple-800" />
+            <span>@up.ac.th</span>
           </div>
         </div>
 
         <div>
-          <h1 className="text-2xl font-extrabold text-slate-800">
+          <h1 className="text-2xl font-black text-slate-950">
             {step === "email"
-              ? "เข้าสู่ระบบนิสิต ม.พะเยา 💜💛"
-              : "กรอกรหัส OTP 6 หลัก 📩"}
+              ? "เข้าสู่ระบบนิสิต ม.พะเยา"
+              : "กรอกรหัส OTP 6 หลัก"}
           </h1>
-          <p className="text-xs text-slate-500 mt-1">
+          <p className="text-xs text-slate-600 mt-1.5 leading-relaxed font-normal">
             {step === "email"
-              ? "ใช้อีเมลนิสิต @up.ac.th เพื่อรับรหัส OTP (ระบบไม่ขอรหัสผ่านอีเมลมอของคุณ)"
-              : `กรอกรหัส 6 หลักที่ส่งไปยัง ${email}`}
+              ? "ใช้อีเมลนิสิต @up.ac.th เพื่อรับรหัส OTP ปลอดภัย ไม่ต้องใช้รหัสผ่านอีเมลมอของคุณ"
+              : `กรอกรหัส 6 หลักที่ระบบส่งไปยัง ${email}`}
           </p>
         </div>
 
         {errorMsg && (
-          <div className="p-3.5 rounded-2xl bg-rose-50 border border-rose-100 text-rose-600 text-xs font-semibold flex items-center gap-2">
+          <div className="p-3.5 rounded-xl bg-rose-50 border border-rose-200 text-rose-700 text-xs font-semibold flex items-center gap-2">
             <AlertCircle className="w-4 h-4 shrink-0" />
             <span>{errorMsg}</span>
           </div>
         )}
 
         {infoMsg && (
-          <div className="p-3.5 rounded-2xl bg-emerald-50 border border-emerald-100 text-emerald-700 text-xs font-semibold flex items-center gap-2">
-            <CheckCircle2 className="w-4 h-4 shrink-0" />
+          <div className="p-3.5 rounded-xl bg-purple-50 border border-purple-200 text-purple-900 text-xs font-semibold flex items-center gap-2">
+            <CheckCircle2 className="w-4 h-4 shrink-0 text-purple-800" />
             <span>{infoMsg}</span>
           </div>
         )}
@@ -199,19 +190,19 @@ export default function AuthPage({ onLoginSuccess, onBack }) {
           <form onSubmit={handleSendOtp} className="space-y-4">
             <div>
               <div className="flex items-center justify-between mb-1.5">
-                <label className="block text-xs font-bold text-slate-600">
+                <label className="block text-xs font-bold text-slate-700">
                   รหัสนิสิต ม.พะเยา (8 หลัก)
                 </label>
                 {studentId.length === 8 && parsed.isValidUpEmail && (
-                  <span className="text-[11px] font-bold text-purple-600 flex items-center gap-1">
-                    <CheckCircle2 className="w-3.5 h-3.5 text-purple-500" />
+                  <span className="text-[11px] font-bold text-purple-800 flex items-center gap-1">
+                    <Check className="w-3.5 h-3.5 text-purple-700" />
                     {parsed.calculatedYear ? `นิสิตชั้นปีที่ ${parsed.calculatedYear}` : "รหัสถูกต้อง"}
                   </span>
                 )}
               </div>
-              <div className="relative flex items-center rounded-2xl bg-white/80 border border-purple-100 focus-within:border-purple-400 focus-within:ring-4 focus-within:ring-purple-100/70 focus-within:bg-white transition-all shadow-xs overflow-hidden">
+              <div className="relative flex items-center rounded-xl bg-white border border-slate-300 focus-within:border-purple-800 focus-within:ring-2 focus-within:ring-purple-800/10 transition-all shadow-xs overflow-hidden">
                 <div className="pl-3.5 pr-2 flex items-center pointer-events-none text-slate-400">
-                  <Mail className="w-4 h-4 text-purple-400" />
+                  <Mail className="w-4 h-4 text-purple-800" />
                 </div>
                 <input
                   type="text"
@@ -221,12 +212,12 @@ export default function AuthPage({ onLoginSuccess, onBack }) {
                   value={studentId}
                   onChange={handleStudentIdChange}
                   placeholder="เช่น 67021589"
-                  className="w-full py-3 pr-2 bg-transparent text-sm font-semibold tracking-wider text-slate-800 placeholder:text-slate-300 placeholder:font-normal placeholder:tracking-normal focus:outline-none"
+                  className="w-full py-3 pr-2 bg-transparent text-sm font-semibold tracking-wider text-slate-900 placeholder:text-slate-400 placeholder:font-normal placeholder:tracking-normal focus:outline-none"
                   required
                   autoFocus
                 />
-                <div className="pr-3.5 pl-2.5 py-3 bg-purple-50/90 border-l border-purple-100/80 text-xs font-bold text-purple-600 select-none flex items-center gap-1 shrink-0">
-                  <span className="text-purple-400 font-extrabold">@</span>up.ac.th
+                <div className="pr-3.5 pl-2.5 py-3 bg-slate-50 border-l border-slate-200 text-xs font-bold text-purple-900 select-none flex items-center gap-1 shrink-0">
+                  <span className="text-purple-800 font-black">@</span>up.ac.th
                 </div>
               </div>
             </div>
@@ -234,7 +225,7 @@ export default function AuthPage({ onLoginSuccess, onBack }) {
             <button
               type="submit"
               disabled={!parsed.isValidUpEmail || loading}
-              className="w-full py-3.5 rounded-2xl bg-gradient-to-r from-purple-500 to-pink-400 hover:from-purple-600 hover:to-pink-500 text-white font-bold text-sm shadow-lg shadow-purple-200 flex items-center justify-center gap-2 disabled:opacity-40 transition cursor-pointer"
+              className="w-full py-3.5 rounded-xl bg-purple-900 hover:bg-purple-950 text-white font-bold text-sm shadow-xs flex items-center justify-center gap-2 disabled:opacity-40 transition cursor-pointer"
             >
               {loading ? (
                 <>
@@ -257,19 +248,19 @@ export default function AuthPage({ onLoginSuccess, onBack }) {
               value={otp}
               onChange={(e) => setOtp(e.target.value.replace(/\D/g, ""))}
               placeholder="กรอกรหัส 6 หลัก"
-              className="w-full px-4 py-3.5 rounded-2xl bg-white/80 border border-purple-100 text-center text-2xl font-black tracking-widest text-slate-800 focus:bg-white focus:outline-none focus:border-purple-400 focus:ring-4 focus:ring-purple-50 transition"
+              className="w-full px-4 py-3.5 rounded-xl bg-white border border-slate-300 text-center text-2xl font-black tracking-widest text-slate-900 focus:outline-none focus:border-purple-800 focus:ring-2 focus:ring-purple-800/10 transition"
               required
             />
 
             <button
               type="submit"
               disabled={loading}
-              className="w-full py-3.5 rounded-2xl bg-gradient-to-r from-purple-500 to-pink-400 hover:from-purple-600 hover:to-pink-500 text-white font-bold text-sm shadow-lg shadow-purple-200 flex items-center justify-center gap-2 transition cursor-pointer disabled:opacity-40"
+              className="w-full py-3.5 rounded-xl bg-purple-900 hover:bg-purple-950 text-white font-bold text-sm shadow-xs flex items-center justify-center gap-2 transition cursor-pointer disabled:opacity-40"
             >
               {loading ? (
                 <>
                   <Loader2 className="w-4 h-4 animate-spin" />
-                  <span>กำลังตรวจสอบกับ Redis...</span>
+                  <span>กำลังตรวจสอบรหัส OTP...</span>
                 </>
               ) : (
                 <>
@@ -286,9 +277,9 @@ export default function AuthPage({ onLoginSuccess, onBack }) {
                 setErrorMsg("");
                 setInfoMsg("");
               }}
-              className="w-full py-2 text-xs text-slate-400 hover:text-purple-600 font-semibold cursor-pointer transition"
+              className="w-full py-2 text-xs text-slate-500 hover:text-purple-900 font-semibold cursor-pointer transition"
             >
-              ← เปลี่ยนรหัสนิสิต
+              เปลี่ยนรหัสนิสิต
             </button>
           </form>
         )}

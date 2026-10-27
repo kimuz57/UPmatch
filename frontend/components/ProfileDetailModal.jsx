@@ -5,7 +5,6 @@ import React, { useState } from "react";
 import { formatImageUrl } from "@/utils/api";
 import {
   X,
-  Sparkles,
   ChevronLeft,
   ChevronRight,
   GraduationCap,
@@ -15,7 +14,6 @@ import {
   MapPin,
   Heart,
   MessageCircle,
-  Smile,
 } from "lucide-react";
 
 export default function ProfileDetailModal({
@@ -29,7 +27,6 @@ export default function ProfileDetailModal({
 
   if (!isOpen || !user) return null;
 
-  // รวบรวมรูปภาพทั้งหมด (เรียงตาม DisplayOrder)
   const images =
     user.images && Array.isArray(user.images) && user.images.length > 0
       ? user.images
@@ -49,7 +46,6 @@ export default function ProfileDetailModal({
     setActivePhotoIdx((prev) => (prev < images.length - 1 ? prev + 1 : 0));
   };
 
-  // แยกงานอดิเรกเป็น tag ย่อยๆ ถ้ามี
   const hobbiesList = user.hobbies
     ? user.hobbies
         .split(/[,，、]+/)
@@ -58,40 +54,39 @@ export default function ProfileDetailModal({
     : [];
 
   return (
-    <div className="fixed inset-0 z-50 bg-black/70 backdrop-blur-sm flex items-center justify-center p-3 sm:p-4 animate-in fade-in duration-200">
-      <div className="bg-white rounded-3xl max-w-md w-full max-h-[92vh] flex flex-col overflow-hidden shadow-2xl border border-purple-100 relative">
+    <div className="fixed inset-0 z-50 bg-slate-950/70 flex items-center justify-center p-3 sm:p-4">
+      <div className="bg-white rounded-2xl max-w-md w-full max-h-[92vh] flex flex-col overflow-hidden shadow-xl border border-slate-200 relative">
         {/* Floating Close Button */}
         <button
           type="button"
           onClick={onClose}
-          className="absolute top-3 right-3 z-30 w-9 h-9 rounded-full bg-black/50 hover:bg-black/70 backdrop-blur-md text-white flex items-center justify-center shadow-lg transition transform hover:scale-110 active:scale-95 cursor-pointer"
+          className="absolute top-3 right-3 z-30 w-8 h-8 rounded-full bg-black/60 hover:bg-black/80 text-white flex items-center justify-center transition active:scale-95 cursor-pointer"
           title="ปิด"
         >
-          <X className="w-5 h-5 stroke-[2.5]" />
+          <X className="w-4 h-4 stroke-[2.5]" />
         </button>
 
         {/* Scrollable Container */}
-        <div className="flex-1 overflow-y-auto [scrollbar-width:thin] [scrollbar-color:#f1d6fa_transparent]">
-          {/* 1. ส่วนรูปภาพหลัก (Main Photo with Tinder Touch Navigation) */}
+        <div className="flex-1 overflow-y-auto [scrollbar-width:thin]">
+          {/* Main Photo with Touch Navigation */}
           <div className="relative aspect-[4/5] bg-slate-900 overflow-hidden select-none">
             <img
               src={formatImageUrl(currentPhoto)}
               alt={user.name || "User Profile"}
-              className="w-full h-full object-cover transition-all duration-300"
+              className="w-full h-full object-cover"
             />
 
-            {/* Gradient Overlays */}
-            <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-black/30 pointer-events-none" />
+            <div className="absolute inset-0 bg-gradient-to-t from-slate-950/85 via-transparent to-slate-950/20 pointer-events-none" />
 
-            {/* Tinder Progress Dots */}
+            {/* Photo Navigation Progress */}
             {images.length > 1 && (
-              <div className="absolute top-3 inset-x-3 z-20 flex gap-1.5 px-1">
+              <div className="absolute top-3 inset-x-3 z-20 flex gap-1 px-1">
                 {images.map((_, i) => (
                   <div
                     key={i}
                     className={`h-1.5 flex-1 rounded-full transition-all duration-200 ${
                       i === activePhotoIdx
-                        ? "bg-white shadow-sm"
+                        ? "bg-white shadow-xs"
                         : "bg-white/40"
                     }`}
                   />
@@ -108,8 +103,8 @@ export default function ProfileDetailModal({
                   className="absolute left-0 inset-y-0 w-1/3 z-10 cursor-pointer flex items-center justify-start pl-2 opacity-0 hover:opacity-100 transition-opacity"
                   title="รูปก่อนหน้า"
                 >
-                  <span className="w-8 h-8 rounded-full bg-black/40 text-white flex items-center justify-center backdrop-blur-xs">
-                    <ChevronLeft className="w-5 h-5" />
+                  <span className="w-7 h-7 rounded-full bg-black/50 text-white flex items-center justify-center">
+                    <ChevronLeft className="w-4 h-4" />
                   </span>
                 </button>
                 <button
@@ -118,8 +113,8 @@ export default function ProfileDetailModal({
                   className="absolute right-0 inset-y-0 w-1/3 z-10 cursor-pointer flex items-center justify-end pr-2 opacity-0 hover:opacity-100 transition-opacity"
                   title="รูปถัดไป"
                 >
-                  <span className="w-8 h-8 rounded-full bg-black/40 text-white flex items-center justify-center backdrop-blur-xs">
-                    <ChevronRight className="w-5 h-5" />
+                  <span className="w-7 h-7 rounded-full bg-black/50 text-white flex items-center justify-center">
+                    <ChevronRight className="w-4 h-4" />
                   </span>
                 </button>
               </>
@@ -128,41 +123,41 @@ export default function ProfileDetailModal({
             {/* Bottom Info on Photo */}
             <div className="absolute bottom-4 left-4 right-4 z-20 text-white pointer-events-none">
               <div className="flex items-center gap-2">
-                <h1 className="text-2xl font-black drop-shadow-md">
+                <h1 className="text-xl sm:text-2xl font-black drop-shadow-xs">
                   {user.name}
                   {user.age ? `, ${user.age}` : ""}
                 </h1>
-                <span className="bg-emerald-500 text-white text-[10px] font-bold px-2 py-0.5 rounded-full shadow-sm">
-                  ✓ ยืนยันแล้ว
+                <span className="bg-purple-800 text-white text-[10px] font-bold px-2 py-0.5 rounded-full shadow-xs">
+                  ยืนยันแล้ว
                 </span>
               </div>
-              <p className="text-xs text-white/90 drop-shadow mt-0.5 flex items-center gap-1.5 font-medium">
-                <MapPin className="w-3.5 h-3.5 text-pink-400" /> มหาวิทยาลัยพะเยา
+              <p className="text-xs text-slate-200 mt-1 flex items-center gap-1.5 font-medium">
+                <MapPin className="w-3.5 h-3.5 text-purple-300" /> มหาวิทยาลัยพะเยา
                 {user.faculty ? ` • ${user.faculty}` : ""}
               </p>
             </div>
           </div>
 
-          {/* 2. แสดงรูปภาพเรียงๆ ทั้งหมด ("จะโชว รูปเรียงๆ") */}
+          {/* Photo Gallery Thumbnails */}
           {images.length > 1 && (
-            <div className="p-3.5 bg-slate-50 border-b border-purple-50">
+            <div className="p-3 bg-slate-50 border-b border-slate-200">
               <div className="flex items-center justify-between mb-2">
-                <span className="text-[11px] font-bold text-slate-500">
+                <span className="text-[11px] font-bold text-slate-600">
                   รูปภาพทั้งหมด ({images.length} รูป)
                 </span>
-                <span className="text-[10px] text-purple-600 font-semibold">
+                <span className="text-[10px] text-purple-800 font-semibold">
                   แตะที่รูปเพื่อดูภาพใหญ่
                 </span>
               </div>
-              <div className="flex gap-2 overflow-x-auto pb-1 [scrollbar-width:none]">
+              <div className="flex gap-2 overflow-x-auto pb-1 scrollbar-none">
                 {images.map((imgUrl, i) => (
                   <button
                     key={i}
                     type="button"
                     onClick={() => setActivePhotoIdx(i)}
-                    className={`relative w-16 h-20 sm:w-18 sm:h-22 rounded-2xl overflow-hidden shrink-0 border-2 transition-all cursor-pointer ${
+                    className={`relative w-16 h-20 rounded-xl overflow-hidden shrink-0 border-2 transition-all cursor-pointer ${
                       i === activePhotoIdx
-                        ? "border-purple-600 ring-2 ring-purple-400/50 scale-105 shadow-md"
+                        ? "border-purple-800 ring-2 ring-purple-800/30 scale-105 shadow-xs"
                         : "border-slate-200 opacity-70 hover:opacity-100"
                     }`}
                   >
@@ -172,7 +167,7 @@ export default function ProfileDetailModal({
                       className="w-full h-full object-cover"
                     />
                     {i === 0 && (
-                      <span className="absolute bottom-0 inset-x-0 bg-purple-600/90 text-white text-[8px] font-bold text-center py-0.5">
+                      <span className="absolute bottom-0 inset-x-0 bg-purple-900 text-white text-[8px] font-bold text-center py-0.5">
                         รูปหลัก
                       </span>
                     )}
@@ -182,129 +177,109 @@ export default function ProfileDetailModal({
             </div>
           )}
 
-          {/* 3. รายละเอียดต่างๆ (แคปชั่น, MBTI, งานอดิเรก, คณะ, ฯลฯ) */}
-          <div className="p-5 space-y-4">
-            {/* แคปชั่นแนะนำตัว */}
-            <div className="p-4 rounded-2xl bg-gradient-to-br from-purple-50/70 to-pink-50/40 border border-purple-100">
-              <div className="flex items-center gap-1.5 text-purple-700 font-bold text-xs mb-1.5">
-                <Quote className="w-4 h-4 text-purple-500" />
-                <span>แคปชั่น / แนะนำตัว</span>
+          {/* Details Section */}
+          <div className="p-4 space-y-3.5">
+            {/* Caption */}
+            <div className="p-3.5 rounded-xl bg-slate-50 border border-slate-200">
+              <div className="flex items-center gap-1.5 text-purple-900 font-bold text-xs mb-1">
+                <Quote className="w-4 h-4 text-purple-800" />
+                <span>แนะนำตัว</span>
               </div>
               {user.caption || user.bio ? (
-                <p className="text-sm font-bold text-slate-800 leading-relaxed">
+                <p className="text-xs sm:text-sm font-semibold text-slate-900 leading-relaxed">
                   "{user.caption || user.bio}"
                 </p>
               ) : (
-                <div className="text-xs">
-                  <span className="font-bold text-slate-400 block mb-0.5">-</span>
-                  <p className="text-pink-600 font-medium italic">
-                    เขาไม่ได้เพิ่มข้อมูลส่วนนี้ อยากรู้ก็ทักไปถามเลย 😉
-                  </p>
-                </div>
+                <p className="text-xs text-slate-500 font-normal">
+                  ไม่ได้ระบุข้อความแนะนำตัว
+                </p>
               )}
             </div>
 
-            {/* คณะที่เรียน */}
-            <div className="p-4 rounded-2xl bg-slate-50/80 border border-slate-100">
-              <div className="flex items-center gap-1.5 text-slate-700 font-bold text-xs mb-1.5">
-                <GraduationCap className="w-4 h-4 text-purple-600" />
+            {/* Faculty */}
+            <div className="p-3.5 rounded-xl bg-slate-50 border border-slate-200">
+              <div className="flex items-center gap-1.5 text-slate-800 font-bold text-xs mb-1">
+                <GraduationCap className="w-4 h-4 text-purple-800" />
                 <span>คณะที่ศึกษา</span>
               </div>
-              {user.faculty && user.faculty !== "-" ? (
-                <p className="text-sm font-bold text-slate-800">{user.faculty}</p>
-              ) : (
-                <div className="text-xs">
-                  <span className="font-bold text-slate-400 block mb-0.5">-</span>
-                  <p className="text-purple-600 font-medium italic">
-                    มหาวิทยาลัยพะเยา (เด็ก มพ. แน่นอน ทักถามสาขาได้เลย 🎓)
-                  </p>
-                </div>
-              )}
+              <p className="text-xs sm:text-sm font-semibold text-slate-900">
+                {user.faculty && user.faculty !== "-" ? user.faculty : "มหาวิทยาลัยพะเยา"}
+              </p>
             </div>
 
             {/* MBTI */}
-            <div className="p-4 rounded-2xl bg-slate-50/80 border border-slate-100">
-              <div className="flex items-center gap-1.5 text-slate-700 font-bold text-xs mb-1.5">
-                <Brain className="w-4 h-4 text-pink-500" />
+            <div className="p-3.5 rounded-xl bg-slate-50 border border-slate-200">
+              <div className="flex items-center gap-1.5 text-slate-800 font-bold text-xs mb-1">
+                <Brain className="w-4 h-4 text-purple-800" />
                 <span>บุคลิกภาพ (MBTI)</span>
               </div>
               {user.mbti && user.mbti !== "-" ? (
-                <div className="inline-block px-3 py-1 rounded-xl bg-gradient-to-r from-purple-600 to-pink-500 text-white font-extrabold text-xs shadow-xs">
+                <div className="inline-block px-2.5 py-0.5 rounded-md bg-purple-100 text-purple-900 border border-purple-200 font-bold text-xs">
                   {user.mbti}
                 </div>
               ) : (
-                <div className="text-xs">
-                  <span className="font-bold text-slate-400 block mb-0.5">-</span>
-                  <p className="text-pink-600 font-medium italic">
-                    ไม่บอกนิสัย อยากรู้ต้องทักมาทำความรู้จักเองนะ ✨
-                  </p>
-                </div>
+                <p className="text-xs text-slate-500 font-normal">ไม่ได้ระบุ MBTI</p>
               )}
             </div>
 
-            {/* งานอดิเรก */}
-            <div className="p-4 rounded-2xl bg-slate-50/80 border border-slate-100">
-              <div className="flex items-center gap-1.5 text-slate-700 font-bold text-xs mb-1.5">
-                <Palette className="w-4 h-4 text-amber-500" />
-                <span>งานอดิเรกที่ชอบ</span>
+            {/* Hobbies */}
+            <div className="p-3.5 rounded-xl bg-slate-50 border border-slate-200">
+              <div className="flex items-center gap-1.5 text-slate-800 font-bold text-xs mb-1">
+                <Palette className="w-4 h-4 text-amber-700" />
+                <span>งานอดิเรก</span>
               </div>
               {hobbiesList.length > 0 ? (
                 <div className="flex flex-wrap gap-1.5 mt-1">
                   {hobbiesList.map((hobby, idx) => (
                     <span
                       key={idx}
-                      className="text-xs bg-white border border-purple-200 text-purple-700 px-3 py-1 rounded-full font-medium shadow-2xs"
+                      className="text-xs bg-white border border-slate-200 text-slate-800 px-2.5 py-0.5 rounded-md font-medium"
                     >
                       {hobby}
                     </span>
                   ))}
                 </div>
               ) : (
-                <div className="text-xs">
-                  <span className="font-bold text-slate-400 block mb-0.5">-</span>
-                  <p className="text-amber-700 font-medium italic">
-                    เขาไม่ได้ลงไว้ ทักไปถามดู เผื่อมีเวลาว่างตรงกัน 🧋
-                  </p>
-                </div>
+                <p className="text-xs text-slate-500 font-normal">ไม่ได้ระบุงานอดิเรก</p>
               )}
             </div>
 
-            {/* เพศ & ความสนใจ */}
+            {/* Gender & Preference */}
             <div className="grid grid-cols-2 gap-2 text-xs">
-              <div className="p-3 rounded-2xl bg-slate-50 border border-slate-100">
-                <span className="text-slate-400 block font-semibold mb-0.5">เพศ</span>
-                <span className="font-bold text-slate-800">{user.gender || "-"}</span>
+              <div className="p-3 rounded-xl bg-slate-50 border border-slate-200">
+                <span className="text-slate-500 block font-medium mb-0.5">เพศ</span>
+                <span className="font-bold text-slate-900">{user.gender || "-"}</span>
               </div>
-              <div className="p-3 rounded-2xl bg-slate-50 border border-slate-100">
-                <span className="text-slate-400 block font-semibold mb-0.5">สนใจ</span>
-                <span className="font-bold text-slate-800">{user.preference || "-"}</span>
+              <div className="p-3 rounded-xl bg-slate-50 border border-slate-200">
+                <span className="text-slate-500 block font-medium mb-0.5">สนใจ</span>
+                <span className="font-bold text-slate-900">{user.preference || "-"}</span>
               </div>
             </div>
           </div>
         </div>
 
         {/* Footer Actions */}
-        <div className="p-3.5 bg-white border-t border-purple-50 shrink-0">
+        <div className="p-3 bg-white border-t border-slate-200 shrink-0">
           {actionType === "chat" ? (
             <button
               type="button"
               onClick={onClose}
-              className="w-full py-3.5 rounded-2xl bg-gradient-to-r from-purple-600 to-pink-500 hover:opacity-95 text-white font-extrabold text-sm shadow-lg shadow-purple-200 flex items-center justify-center gap-2 transition cursor-pointer"
+              className="w-full py-3 rounded-xl bg-purple-900 hover:bg-purple-950 text-white font-bold text-xs sm:text-sm shadow-xs flex items-center justify-center gap-2 transition cursor-pointer"
             >
               <MessageCircle className="w-4 h-4" />
               คุยกับ {user.name} ต่อเลย
             </button>
           ) : actionType === "swipe" ? (
-            <div className="flex gap-3">
+            <div className="flex gap-2.5">
               <button
                 type="button"
                 onClick={() => {
                   onClose();
                   onAction?.("left");
                 }}
-                className="w-1/2 py-3 rounded-2xl bg-slate-100 hover:bg-rose-50 text-rose-500 font-bold text-sm border border-slate-200 flex items-center justify-center gap-1.5 transition cursor-pointer"
+                className="w-1/2 py-2.5 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold text-xs sm:text-sm border border-slate-200 flex items-center justify-center gap-1.5 transition cursor-pointer"
               >
-                <X className="w-4 h-4 stroke-[3]" />
+                <X className="w-4 h-4 stroke-[2.5]" />
                 ข้าม
               </button>
               <button
@@ -313,7 +288,7 @@ export default function ProfileDetailModal({
                   onClose();
                   onAction?.("right");
                 }}
-                className="w-1/2 py-3 rounded-2xl bg-gradient-to-r from-purple-600 to-pink-500 hover:opacity-95 text-white font-bold text-sm shadow-md shadow-pink-200 flex items-center justify-center gap-1.5 transition cursor-pointer"
+                className="w-1/2 py-2.5 rounded-xl bg-rose-600 hover:bg-rose-700 text-white font-bold text-xs sm:text-sm shadow-xs flex items-center justify-center gap-1.5 transition cursor-pointer"
               >
                 <Heart className="w-4 h-4 fill-white" />
                 ถูกใจ
@@ -323,7 +298,7 @@ export default function ProfileDetailModal({
             <button
               type="button"
               onClick={onClose}
-              className="w-full py-3 rounded-2xl bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold text-sm transition cursor-pointer"
+              className="w-full py-2.5 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold text-xs sm:text-sm transition cursor-pointer"
             >
               ปิดหน้าต่าง
             </button>

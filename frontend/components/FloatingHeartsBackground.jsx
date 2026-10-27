@@ -34,23 +34,22 @@ export default function FloatingHeartsBackground() {
       aria-hidden="true"
       className="fixed inset-0 overflow-hidden pointer-events-none z-0 select-none"
     >
-      {/* แสงสีเบลอ Gradient Orbs (ม่วง-ชมพู) เหมือนหน้าแรก */}
-      <div className="absolute top-[-10%] left-[-10%] w-[500px] h-[500px] bg-purple-200/40 rounded-full blur-3xl pointer-events-none" />
-      <div className="absolute bottom-[-10%] right-[-10%] w-[500px] h-[500px] bg-pink-200/35 rounded-full blur-3xl pointer-events-none" />
-      <div className="absolute top-[40%] right-[-5%] w-[350px] h-[350px] bg-purple-100/30 rounded-full blur-3xl pointer-events-none" />
+      {/* Subtle, tasteful ambient lighting (clean and calm, non-distracting) */}
+      <div className="absolute top-0 left-1/4 w-96 h-96 bg-purple-100/30 rounded-full blur-2xl pointer-events-none" />
+      <div className="absolute bottom-10 right-1/4 w-80 h-80 bg-slate-100/40 rounded-full blur-2xl pointer-events-none" />
 
-      {/* ฟองสบู่รูปหัวใจลอยขึ้นด้านบนแบบ Smooth Infinite Loop */}
+      {/* Gentle floating hearts */}
       {mounted &&
         floatingHearts.map((heart) => (
           <motion.div
             key={heart.id}
-            className={`absolute bottom-[-10%] ${heart.color}`}
+            className="absolute bottom-[-5%] text-purple-400/20"
             style={{ left: heart.left }}
             animate={{
-              y: ["0vh", "-125vh"],
-              x: ["0px", "22px", "-22px", "0px"],
-              rotate: [0, 25, -25, 0],
-              opacity: [0, 0.85, 0.85, 0],
+              y: ["0vh", "-120vh"],
+              x: ["0px", "16px", "-16px", "0px"],
+              rotate: [0, 15, -15, 0],
+              opacity: [0, 0.6, 0.6, 0],
             }}
             transition={{
               duration: heart.duration,
@@ -63,7 +62,7 @@ export default function FloatingHeartsBackground() {
               width={heart.size}
               height={heart.size}
               fill="currentColor"
-              strokeWidth={1}
+              strokeWidth={0}
             />
           </motion.div>
         ))}

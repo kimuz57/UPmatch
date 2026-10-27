@@ -7,7 +7,7 @@ import { motion, AnimatePresence } from "framer-motion";
 import { Heart, MessageCircle, X } from "lucide-react";
 import { getApiBaseUrl, formatImageUrl } from "@/utils/api";
 
-// 🎵 ฟังก์ชันสร้างเสียงแจ้งเตือนผ่าน Web Audio API (ไม่ต้องพึ่งไฟล์ MP3, ทำงานได้ 100% ทุกบราวเซอร์)
+// ฟังก์ชันสร้างเสียงแจ้งเตือนผ่าน Web Audio API
 function playNotificationChime(type = "message") {
   try {
     const settingsStr = typeof window !== "undefined" ? localStorage.getItem("upmatch_settings") : null;
@@ -26,7 +26,7 @@ function playNotificationChime(type = "message") {
     const now = ctx.currentTime;
 
     if (type === "match") {
-      // 🎶 เสียงหวานสดใสสำหรับ Match (E5 -> G#5 -> B5 -> E6)
+      // เสียงสำหรับ Match (E5 -> G#5 -> B5 -> E6)
       const notes = [659.25, 830.61, 987.77, 1318.51];
       notes.forEach((freq, idx) => {
         const osc = ctx.createOscillator();
@@ -41,7 +41,7 @@ function playNotificationChime(type = "message") {
         osc.stop(now + idx * 0.1 + 0.4);
       });
     } else {
-      // 🔔 เสียงกระดิ่งข้อความใส 2 จังหวะ (G5 -> C6)
+      // เสียงกระดิ่งข้อความ (G5 -> C6)
       [783.99, 1046.5].forEach((freq, idx) => {
         const osc = ctx.createOscillator();
         const gain = ctx.createGain();
@@ -199,7 +199,7 @@ export default function GlobalNotification() {
         const sseUrl = `${baseUrl}/api/v1/chat/sse?email=${encodeURIComponent(email)}`;
         eventSource = new EventSource(sseUrl, { withCredentials: true });
 
-        // 💌 เมื่อมีข้อความใหม่เข้ามา
+        // เมื่อมีข้อความใหม่เข้ามา
         const handleMessage = (e) => {
           try {
             const data = JSON.parse(e.data);
@@ -246,9 +246,9 @@ export default function GlobalNotification() {
             if (notifyMsg) {
               let displayContent = data.content || "";
               if (/^https?:\/\/.*(giphy\.com|tenor\.com|\.gif)/i.test(displayContent)) {
-                displayContent = "[ส่ง GIF] 🎬";
+                displayContent = "[ภาพเคลื่อนไหว GIF]";
               } else if (/^https?:\/\/.*(\.png|\.jpe?g|\.webp)/i.test(displayContent)) {
-                displayContent = "[ส่งรูปภาพ] 📷";
+                displayContent = "[รูปภาพ]";
               }
 
               showToast({
@@ -280,7 +280,7 @@ export default function GlobalNotification() {
         eventSource.addEventListener("message", handleMessage);
         eventSource.onmessage = handleMessage;
 
-        // 🎉 เมื่อเกิด MATCH ใหม่!
+        // เมื่อเกิด MATCH ใหม่
         eventSource.addEventListener("match", (e) => {
           try {
             const data = JSON.parse(e.data);
@@ -301,14 +301,14 @@ export default function GlobalNotification() {
               })
             );
 
-            // เล่นเสียงแจ้งเตือนหวานๆ ของ Match
+            // เล่นเสียงแจ้งเตือนของ Match
             playNotificationChime("match");
 
             if (notifyMatch) {
               const matched = data.matched_user || {};
               showToast({
                 type: "match",
-                title: data.title || "ใจตรงกันแล้ว! 🎉",
+                title: data.title || "ใจตรงกันแล้ว",
                 content: data.message || `คุณกับ ${matched.name || "เพื่อนใหม่"} ใจตรงกันแล้ว!`,
                 image: matched.image || "/logo.png",
                 link: `/chat/${matched.hash || matched.id || ""}`,
@@ -320,7 +320,7 @@ export default function GlobalNotification() {
             // ยิง Native Notification
             if (typeof window !== "undefined" && "Notification" in window && Notification.permission === "granted") {
               const matched = data.matched_user || {};
-              const notif = new Notification("ใจตรงกันแล้ว! 🎉 UP Match", {
+              const notif = new Notification("ใจตรงกันแล้ว UP Match", {
                 body: `คุณกับ ${matched.name || "เพื่อนใหม่"} ใจตรงกันแล้ว เริ่มแชทได้เลย!`,
                 icon: formatImageUrl(matched.image) || "/logo.png",
               });
@@ -377,56 +377,56 @@ export default function GlobalNotification() {
     <AnimatePresence>
       {activeToast && (
         <motion.div
-          initial={{ y: -80, opacity: 0, scale: 0.95 }}
+          initial={{ y: -60, opacity: 0, scale: 0.98 }}
           animate={{ y: 0, opacity: 1, scale: 1 }}
-          exit={{ y: -70, opacity: 0, scale: 0.95 }}
-          transition={{ type: "spring", stiffness: 450, damping: 30 }}
+          exit={{ y: -50, opacity: 0, scale: 0.98 }}
+          transition={{ duration: 0.18 }}
           className="fixed top-3 sm:top-5 left-0 right-0 z-[9999] flex justify-center px-3.5 sm:px-4 pointer-events-none"
         >
           <div
             onClick={handleToastClick}
-            className={`pointer-events-auto flex items-center gap-3 p-3 sm:p-3.5 max-w-md w-full rounded-2xl sm:rounded-3xl shadow-2xl backdrop-blur-xl border cursor-pointer transition transform active:scale-98 ${
+            className={`pointer-events-auto flex items-center gap-3 p-3 max-w-md w-full rounded-xl shadow-lg border cursor-pointer transition transform active:scale-[0.99] ${
               activeToast.type === "match"
-                ? "bg-gradient-to-r from-pink-500/95 via-purple-600/95 to-indigo-600/95 text-white border-pink-300/40 shadow-pink-500/25"
-                : "bg-white/95 text-slate-800 border-purple-100/90 shadow-purple-900/15"
+                ? "bg-slate-900 text-white border-rose-500/40"
+                : "bg-white text-slate-900 border-slate-200"
             }`}
           >
-            {/* รูปโปรไฟล์พร้อม Badge เล็ก */}
+            {/* Avatar with status icon */}
             <div className="relative shrink-0">
               <img
                 src={formatImageUrl(activeToast.image) || "/logo.png"}
                 alt={activeToast.title}
-                className="w-11 h-11 sm:w-12 sm:h-12 rounded-2xl object-cover ring-2 ring-white/80 shadow-md"
+                className="w-11 h-11 rounded-lg object-cover border border-slate-200"
                 onError={(e) => {
                   e.currentTarget.src = "/logo.png";
                 }}
               />
               <div
-                className={`absolute -bottom-1 -right-1 w-5 h-5 rounded-full flex items-center justify-center text-[10px] shadow-sm ${
-                  activeToast.type === "match" ? "bg-pink-500 text-white ring-2 ring-white" : "bg-purple-600 text-white ring-2 ring-white"
+                className={`absolute -bottom-1 -right-1 w-4.5 h-4.5 rounded-full flex items-center justify-center text-[10px] shadow-xs ${
+                  activeToast.type === "match" ? "bg-rose-600 text-white ring-2 ring-slate-900" : "bg-purple-900 text-white ring-2 ring-white"
                 }`}
               >
                 {activeToast.type === "match" ? (
-                  <Heart className="w-3 h-3 fill-white text-white" />
+                  <Heart className="w-2.5 h-2.5 fill-white text-white" />
                 ) : (
-                  <MessageCircle className="w-3 h-3 fill-white text-white" />
+                  <MessageCircle className="w-2.5 h-2.5 fill-white text-white" />
                 )}
               </div>
             </div>
 
-            {/* เนื้อหาการแจ้งเตือน */}
+            {/* Notification Text */}
             <div className="flex-1 min-w-0 pr-1">
               <div className="flex items-center justify-between gap-1">
                 <span
                   className={`text-xs font-black truncate ${
-                    activeToast.type === "match" ? "text-white" : "text-slate-900"
+                    activeToast.type === "match" ? "text-white" : "text-slate-950"
                   }`}
                 >
                   {activeToast.title}
                 </span>
                 <span
                   className={`text-[10px] font-medium shrink-0 ${
-                    activeToast.type === "match" ? "text-pink-100" : "text-slate-400"
+                    activeToast.type === "match" ? "text-slate-300" : "text-slate-400"
                   }`}
                 >
                   {activeToast.time}
@@ -434,24 +434,24 @@ export default function GlobalNotification() {
               </div>
               <p
                 className={`text-xs mt-0.5 line-clamp-1 leading-snug ${
-                  activeToast.type === "match" ? "text-pink-50 font-medium" : "text-slate-600 font-normal"
+                  activeToast.type === "match" ? "text-slate-200 font-normal" : "text-slate-600 font-normal"
                 }`}
               >
                 {activeToast.content}
               </p>
             </div>
 
-            {/* ปุ่มปิด */}
+            {/* Close Button */}
             <button
               type="button"
               onClick={(e) => {
                 e.stopPropagation();
                 dismissToast();
               }}
-              className={`p-1.5 rounded-full transition shrink-0 ${
+              className={`p-1.5 rounded-lg transition shrink-0 cursor-pointer ${
                 activeToast.type === "match"
-                  ? "hover:bg-white/20 text-white/80 hover:text-white"
-                  : "hover:bg-slate-100 text-slate-400 hover:text-slate-600"
+                  ? "hover:bg-slate-800 text-slate-400 hover:text-white"
+                  : "hover:bg-slate-100 text-slate-400 hover:text-slate-700"
               }`}
             >
               <X className="w-4 h-4" />
