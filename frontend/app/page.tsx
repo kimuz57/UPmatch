@@ -78,7 +78,7 @@ export default function LandingPage() {
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-10 lg:gap-14 items-center">
           {/* Left Column: Editorial Headline & Actions */}
           <div className="lg:col-span-7 text-left space-y-6">
-            <h1 className="text-4xl sm:text-5xl lg:text-6xl font-black tracking-tight text-slate-950 leading-[1.15]">
+            <h1 className="text-2xl sm:text-3xl lg:text-4xl font-black tracking-tight text-slate-950 leading-snug">
               UPmatch — เว็บหาคู่ ม.พะเยา พื้นที่หาเพื่อน หาแฟน และหาคนคุยสำหรับนิสิต
             </h1>
 
