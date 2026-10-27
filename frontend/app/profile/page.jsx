@@ -21,6 +21,9 @@ import {
   RefreshCw,
   ChevronRight,
   ShieldAlert,
+  Mail,
+  Copy,
+  ExternalLink,
 } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { getApiBaseUrl, formatImageUrl } from "@/utils/api";
@@ -49,6 +52,15 @@ export default function ProfilePage() {
   const [saving, setSaving] = useState(false);
 
   const [activeModal, setActiveModal] = useState(null);
+  const [copiedEmail, setCopiedEmail] = useState(false);
+
+  const handleCopyEmail = () => {
+    if (typeof navigator !== "undefined" && navigator.clipboard) {
+      navigator.clipboard.writeText("67024942@up.ac.th");
+      setCopiedEmail(true);
+      setTimeout(() => setCopiedEmail(false), 2000);
+    }
+  };
 
   const [editForm, setEditForm] = useState({
     name: "",
@@ -572,6 +584,23 @@ export default function ProfilePage() {
               <div className="text-left">
                 <span className="font-bold text-xs sm:text-sm text-slate-800 block">ข้อกำหนดและข้อสงวนสิทธิ์ (Disclaimer)</span>
                 <span className="text-[11px] text-slate-400">วัตถุประสงค์เพื่อการศึกษา และแนวทางความปลอดภัย</span>
+              </div>
+            </div>
+            <ChevronRight className="w-4 h-4 text-slate-400" />
+          </button>
+
+          <button
+            type="button"
+            onClick={() => setActiveModal("contact")}
+            className="w-full flex items-center justify-between p-3.5 bg-white border border-slate-200 rounded-xl shadow-2xs hover:bg-slate-50 transition cursor-pointer"
+          >
+            <div className="flex items-center gap-3">
+              <div className="bg-purple-100 p-2 rounded-lg text-purple-900">
+                <Mail className="w-4 h-4" />
+              </div>
+              <div className="text-left">
+                <span className="font-bold text-xs sm:text-sm text-slate-800 block">ติดต่อผู้พัฒนา (Contact Developer)</span>
+                <span className="text-[11px] text-slate-400">อีเมล, Instagram, Facebook</span>
               </div>
             </div>
             <ChevronRight className="w-4 h-4 text-slate-400" />
@@ -1132,6 +1161,121 @@ export default function ProfilePage() {
                 className="w-full sm:w-auto px-5 py-2.5 rounded-xl bg-purple-900 hover:bg-purple-950 text-white font-bold text-xs shadow-xs cursor-pointer transition active:scale-98"
               >
                 รับทราบและเข้าใจข้อตกลง
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* MODAL 5: Contact Developer (Popup เล็กๆ) */}
+      {activeModal === "contact" && (
+        <div className="fixed inset-0 z-50 bg-slate-900/60 flex items-center justify-center p-4">
+          <div className="bg-white rounded-2xl max-w-sm w-full p-5 sm:p-6 shadow-xl border border-slate-200">
+            <div className="flex items-center justify-between pb-3.5 border-b border-slate-100 mb-4">
+              <div className="flex items-center gap-2.5">
+                <div className="w-8 h-8 rounded-lg bg-purple-100 text-purple-900 flex items-center justify-center shrink-0">
+                  <Mail className="w-4 h-4" />
+                </div>
+                <div>
+                  <h2 className="text-sm sm:text-base font-black text-slate-900">
+                    ติดต่อผู้พัฒนา
+                  </h2>
+                  <p className="text-[11px] text-slate-500 font-medium">UP Match Student Developer</p>
+                </div>
+              </div>
+              <button
+                type="button"
+                onClick={() => setActiveModal(null)}
+                className="p-1 rounded-lg hover:bg-slate-100 text-slate-400 hover:text-slate-700 cursor-pointer"
+              >
+                <X className="w-5 h-5" />
+              </button>
+            </div>
+
+            <div className="space-y-3">
+              {/* Email */}
+              <div className="p-3 rounded-xl bg-slate-50 border border-slate-200">
+                <div className="flex items-center justify-between mb-1">
+                  <span className="text-[11px] font-bold text-slate-500 uppercase tracking-wider">Email</span>
+                  <button
+                    type="button"
+                    onClick={handleCopyEmail}
+                    className="text-[11px] font-bold text-purple-900 hover:text-purple-950 flex items-center gap-1 cursor-pointer"
+                  >
+                    {copiedEmail ? (
+                      <span className="text-purple-900 font-bold">คัดลอกเรียบร้อย ✓</span>
+                    ) : (
+                      <>
+                        <Copy className="w-3.5 h-3.5" />
+                        <span>คัดลอก</span>
+                      </>
+                    )}
+                  </button>
+                </div>
+                <a
+                  href="mailto:67024942@up.ac.th"
+                  className="text-xs sm:text-sm font-bold text-slate-900 hover:text-purple-900 break-all block"
+                >
+                  67024942@up.ac.th
+                </a>
+              </div>
+
+              {/* Instagram */}
+              <a
+                href="https://instagram.com/kitdhgiiob"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="p-3 rounded-xl bg-slate-50 border border-slate-200 flex items-center justify-between hover:bg-purple-50/50 hover:border-purple-200 transition cursor-pointer group"
+              >
+                <div className="flex items-center gap-2.5">
+                  <div className="w-7 h-7 rounded-lg bg-pink-100 text-pink-700 flex items-center justify-center shrink-0">
+                    <svg className="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                      <rect width="20" height="20" x="2" y="2" rx="5" ry="5"/>
+                      <path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"/>
+                      <line x1="17.5" x2="17.51" y1="6.5" y2="6.5"/>
+                    </svg>
+                  </div>
+                  <div>
+                    <span className="text-[11px] font-bold text-slate-500 block">Instagram</span>
+                    <span className="text-xs sm:text-sm font-bold text-slate-900 group-hover:text-purple-900">@kitdhgiiob</span>
+                  </div>
+                </div>
+                <ExternalLink className="w-4 h-4 text-slate-400 group-hover:text-purple-900 transition" />
+              </a>
+
+              {/* Facebook */}
+              <a
+                href="https://www.facebook.com/profile.php?id=100070998043139"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="p-3 rounded-xl bg-slate-50 border border-slate-200 flex items-center justify-between hover:bg-purple-50/50 hover:border-purple-200 transition cursor-pointer group"
+              >
+                <div className="flex items-center gap-2.5">
+                  <div className="w-7 h-7 rounded-lg bg-blue-100 text-blue-700 flex items-center justify-center shrink-0">
+                    <svg className="w-4 h-4" viewBox="0 0 24 24" fill="currentColor">
+                      <path d="M18 2h-3a5 5 0 0 0-5 5v3H7v4h3v8h4v-8h3l1-4h-4V7a1 1 0 0 1 1-1h3z"/>
+                    </svg>
+                  </div>
+                  <div>
+                    <span className="text-[11px] font-bold text-slate-500 block">Facebook</span>
+                    <span className="text-xs sm:text-sm font-bold text-slate-900 group-hover:text-purple-900">Facebook Profile</span>
+                  </div>
+                </div>
+                <ExternalLink className="w-4 h-4 text-slate-400 group-hover:text-purple-900 transition" />
+              </a>
+            </div>
+
+            <p className="text-[11px] text-slate-400 text-center mt-4">
+              แจ้งบั๊ก เสนอแนะฟีเจอร์ หรือติดต่อสอบถามได้ตลอดเวลา
+            </p>
+
+            <div className="mt-4 pt-3 border-t border-slate-100">
+              <button
+                type="button"
+                onClick={() => setActiveModal(null)}
+                className="w-full py-2.5 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold text-xs cursor-pointer transition"
+              >
+                ปิดหน้าต่าง
               </button>
             </div>
           </div>

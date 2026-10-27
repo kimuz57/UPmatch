@@ -154,14 +154,43 @@ export default function LandingPage() {
       </main>
 
       <footer className="py-8 px-4 text-center text-slate-500 border-t border-slate-200/80 bg-white/80 relative z-10">
-        <div className="max-w-3xl mx-auto space-y-2.5">
+        <div className="max-w-3xl mx-auto space-y-3">
           <p className="text-xs font-bold text-slate-700">
             UP Match • Just Match, The Right Person
           </p>
           <p className="text-[11px] text-slate-500 leading-relaxed font-normal">
             <strong className="font-semibold text-slate-700">ข้อจำกัดความรับผิดชอบ (Disclaimer):</strong> เว็บไซต์ UP Match เป็นโครงงานอิสระที่พัฒนาขึ้นโดยนิสิตเพื่อการศึกษาและพัฒนาทักษะการทำเว็บแอปพลิเคชันเท่านั้น <strong className="font-semibold text-slate-700">ไม่มีความเกี่ยวข้อง ดำเนินการ หรือได้รับการรับรองอย่างเป็นทางการจากมหาวิทยาลัยพะเยา</strong> ผู้พัฒนาไม่มีส่วนเกี่ยวข้องและไม่รับผิดชอบต่อพฤติกรรม ข้อพิพาท หรือความเสียหายใดๆ ที่เกิดขึ้นระหว่างผู้ใช้งาน โปรดใช้ความระมัดระวังในการสนทนาและปกป้องข้อมูลส่วนบุคคลของท่าน
           </p>
-          <p className="text-[10px] text-slate-400">
+
+          <div className="pt-2 border-t border-slate-200/60 flex flex-wrap items-center justify-center gap-x-3 sm:gap-x-4 gap-y-1.5 text-[11px] text-slate-600">
+            <span className="font-semibold text-slate-700">ติดต่อผู้พัฒนา:</span>
+            <a
+              href="mailto:67024942@up.ac.th"
+              className="text-purple-900 hover:text-purple-950 hover:underline font-medium"
+            >
+              67024942@up.ac.th
+            </a>
+            <span className="text-slate-300">•</span>
+            <a
+              href="https://instagram.com/kitdhgiiob"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="text-purple-900 hover:text-purple-950 hover:underline font-medium"
+            >
+              IG: @kitdhgiiob
+            </a>
+            <span className="text-slate-300">•</span>
+            <a
+              href="https://www.facebook.com/profile.php?id=100070998043139"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="text-purple-900 hover:text-purple-950 hover:underline font-medium"
+            >
+              Facebook Profile
+            </a>
+          </div>
+
+          <p className="text-[10px] text-slate-400 pt-1">
             © 2026 UP Match Student Project. All rights reserved.
           </p>
         </div>
