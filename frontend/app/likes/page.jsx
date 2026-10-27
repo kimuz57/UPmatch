@@ -294,41 +294,42 @@ export default function LikesPage() {
 
       {/* Centered PRO Referral Unlock Overlay (แสดงกลางหน้าจอเมื่อยังไม่ได้เป็น PRO) */}
       {!isPro && (
-        <div className="fixed inset-0 top-14 sm:top-16 z-40 flex items-center justify-center p-4 bg-slate-900/15 pointer-events-auto">
+        <div className="fixed inset-0 top-14 sm:top-16 z-40 flex items-center justify-center p-4 bg-slate-900/25 pointer-events-auto">
           <motion.div
-            initial={{ scale: 0.95, opacity: 0 }}
+            initial={{ scale: 0.96, opacity: 0 }}
             animate={{ scale: 1, opacity: 1 }}
-            transition={{ duration: 0.2 }}
-            className="p-6 sm:p-8 bg-white rounded-3xl border border-slate-200 shadow-xl max-w-md w-full text-center space-y-4 relative z-50"
+            transition={{ duration: 0.18 }}
+            className="p-6 sm:p-7 bg-white rounded-2xl border border-slate-200 shadow-xl max-w-md w-full text-center space-y-5 relative z-50"
           >
-            <div className="w-12 h-12 mx-auto rounded-2xl bg-purple-100 text-purple-900 flex items-center justify-center shadow-xs">
-              <Users className="w-6 h-6" />
-            </div>
-
+            {/* Header Badge & Title */}
             <div>
-              <h2 className="text-base sm:text-lg font-black text-slate-900">
+              <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-purple-50 text-purple-900 border border-purple-200 text-xs font-bold tracking-wide mb-3">
+                <Users className="w-3.5 h-3.5 text-purple-800" />
+                <span>UP MATCH PRO</span>
+              </span>
+
+              <h2 className="text-lg sm:text-xl font-black text-slate-900 tracking-tight">
                 ชวนเพื่อน 1 คนเพื่อปลดล็อกเป็น PRO ถาวร
               </h2>
-              <p className="text-xs text-slate-600 mt-1.5 leading-relaxed">
-                ส่งลิงก์ด้านล่างให้เพื่อนนิสิต ม.พะเยา 1 คน เมื่อเพื่อนสมัครสำเร็จ
-                ระบบจะอัปเกรดบัญชีของคุณเป็น PRO ทันที ดูรูปชัดเจนและกดแมตช์ได้ทุกคน
+              <p className="text-xs text-slate-600 mt-2 leading-relaxed">
+                ส่งลิงก์ด้านล่างเพื่อชวนเพื่อน 1 คน เมื่อเพื่อนสมัครสำเร็จ ระบบจะอัปเกรดบัญชีของคุณเป็น PRO ทันที คุณสามารถกดแมตช์ได้ทุกคน
               </p>
             </div>
 
             {/* Referral Link Box */}
-            <div className="space-y-2 pt-1">
+            <div className="space-y-2.5">
               <div className="flex items-center gap-2 p-1.5 bg-slate-50 border border-slate-200 rounded-xl">
                 <input
                   type="text"
                   readOnly
                   value={inviteUrl || "กำลังสร้างลิงก์ชวนเพื่อน..."}
-                  className="flex-1 bg-transparent text-xs text-slate-800 font-mono px-2 py-1 outline-none select-all truncate"
+                  className="flex-1 bg-transparent text-xs text-slate-800 font-mono px-2.5 py-1.5 outline-none select-all truncate"
                 />
                 <button
                   type="button"
                   onClick={handleCopyLink}
                   disabled={!inviteUrl}
-                  className="px-3 py-1.5 rounded-lg bg-purple-900 hover:bg-purple-950 text-white font-bold text-xs shadow-xs transition flex items-center gap-1.5 cursor-pointer shrink-0 disabled:opacity-50"
+                  className="px-3.5 py-1.5 rounded-lg bg-purple-900 hover:bg-purple-950 active:scale-[0.98] text-white font-bold text-xs shadow-xs transition flex items-center gap-1.5 cursor-pointer shrink-0 disabled:opacity-50"
                 >
                   {copied ? (
                     <>
@@ -349,17 +350,11 @@ export default function LikesPage() {
                 type="button"
                 onClick={handleShareLine}
                 disabled={!inviteUrl}
-                className="w-full py-2.5 px-4 rounded-xl bg-[#06C755] hover:bg-[#05b34c] text-white font-bold text-xs shadow-xs transition flex items-center justify-center gap-2 cursor-pointer disabled:opacity-50"
+                className="w-full py-2.5 px-4 rounded-xl bg-[#06C755] hover:bg-[#05b34c] active:scale-[0.98] text-white font-bold text-xs shadow-xs transition flex items-center justify-center gap-2 cursor-pointer disabled:opacity-50"
               >
                 <Share2 className="w-4 h-4" />
                 <span>แชร์ไปยัง LINE ให้เพื่อนสมัคร</span>
               </button>
-            </div>
-
-            {/* Live Indicator */}
-            <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-slate-100 text-slate-600 text-[11px] font-medium border border-slate-200">
-              <span className="w-2 h-2 rounded-full bg-rose-600 animate-ping shrink-0" />
-              <span>ระบบ Real-time กำลังรอเพื่อน 1 คนสมัครผ่านลิงก์...</span>
             </div>
           </motion.div>
         </div>
