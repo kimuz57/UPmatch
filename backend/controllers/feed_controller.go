@@ -19,7 +19,7 @@ func getDefaultAvatar() string {
 	if avatar := os.Getenv("DEFAULT_AVATAR_URL"); avatar != "" {
 		return avatar
 	}
-	return "https://images.unsplash.com/photo-1517841905240-472988babdf9?auto=format&fit=crop&w=800&q=80"
+	return "/logo.png"
 }
 
 // โครงสร้างข้อมูลโปรไฟล์ที่ดึงจาก Database

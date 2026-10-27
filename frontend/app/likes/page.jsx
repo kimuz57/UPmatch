@@ -18,6 +18,7 @@ import {
 import { motion, AnimatePresence } from "framer-motion";
 import Link from "next/link";
 import { getApiBaseUrl, formatImageUrl } from "@/utils/api";
+import ProfileDetailModal from "@/components/ProfileDetailModal";
 
 export default function LikesPage() {
   const [whoLikesMe, setWhoLikesMe] = useState([]);
@@ -27,6 +28,7 @@ export default function LikesPage() {
   const [copied, setCopied] = useState(false);
   const [matchingId, setMatchingId] = useState(null);
   const [matchedProfile, setMatchedProfile] = useState(null);
+  const [selectedProfile, setSelectedProfile] = useState(null);
 
   const getCookie = (name) => {
     if (typeof document === "undefined") return "";
@@ -144,6 +146,33 @@ export default function LikesPage() {
     }
   };
 
+  const handleSkip = async (liker) => {
+    try {
+      const token = getCookie("up_match_token");
+      const email = getCookie("upmatch_email");
+      const baseUrl = getApiBaseUrl();
+
+      await fetch(`${baseUrl}/api/v1/swipe`, {
+        method: "POST",
+        credentials: "include",
+        headers: {
+          Authorization: `Bearer ${token}`,
+          "X-User-Email": email || "",
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          my_email: email,
+          target_email: liker.id,
+          direction: "left",
+        }),
+      });
+
+      setWhoLikesMe((prev) => prev.filter((item) => item.id !== liker.id));
+    } catch (error) {
+      console.error("Skip error:", error);
+    }
+  };
+
   return (
     <div className="h-dvh max-h-screen bg-transparent text-slate-800 flex flex-col overflow-hidden relative z-10">
       <div className="shrink-0 z-30">
@@ -220,7 +249,14 @@ export default function LikesPage() {
                 animate={{ opacity: 1, scale: 1 }}
                 transition={{ delay: idx * 0.04 }}
                 key={liker.id || idx}
-                className="relative aspect-[3/4.4] rounded-xl overflow-hidden shadow-xs border border-slate-200 bg-slate-900 flex flex-col justify-end group"
+                onClick={() => {
+                  if (isPro) {
+                    setSelectedProfile(liker);
+                  }
+                }}
+                className={`relative aspect-[3/4.4] rounded-xl overflow-hidden shadow-xs border border-slate-200 bg-slate-900 flex flex-col justify-end group ${
+                  isPro ? "cursor-pointer hover:border-purple-400 transition" : ""
+                }`}
               >
                 {/* Liker Photo */}
                 <img
@@ -260,7 +296,10 @@ export default function LikesPage() {
                     <button
                       type="button"
                       disabled={matchingId === liker.id}
-                      onClick={() => handleInstantMatch(liker)}
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        handleInstantMatch(liker);
+                      }}
                       className="w-full mt-2 py-1.5 px-2.5 rounded-lg bg-rose-600 hover:bg-rose-700 active:scale-[0.98] text-white text-[11px] font-bold shadow-xs transition flex items-center justify-center gap-1.5 cursor-pointer disabled:opacity-50"
                       title="กดแมตช์ทันที"
                     >
@@ -394,6 +433,25 @@ export default function LikesPage() {
           </div>
         )}
       </AnimatePresence>
+
+      {/* Full Profile Detail Modal for PRO Users */}
+      {selectedProfile && (
+        <ProfileDetailModal
+          isOpen={Boolean(selectedProfile)}
+          onClose={() => setSelectedProfile(null)}
+          user={selectedProfile}
+          actionType="swipe"
+          onAction={async (direction) => {
+            const target = selectedProfile;
+            setSelectedProfile(null);
+            if (direction === "right") {
+              await handleInstantMatch(target);
+            } else if (direction === "left") {
+              await handleSkip(target);
+            }
+          }}
+        />
+      )}
     </div>
   );
 }

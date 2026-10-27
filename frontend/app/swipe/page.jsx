@@ -188,8 +188,32 @@ export default function SwipePage() {
   };
 
   useEffect(() => {
+    const checkOnboarding = async () => {
+      const email = getCookie("upmatch_email");
+      const token = getCookie("up_match_token");
+      if (!email || !token) return;
+      try {
+        const res = await fetch(`${getApiBaseUrl()}/api/v1/me?email=${encodeURIComponent(email)}`, {
+          headers: { Authorization: `Bearer ${token}` },
+        });
+        if (res.ok) {
+          const data = await res.json();
+          const prof = data?.profile;
+          const isStudentId = /^\d{8}$/.test(prof?.name || "") || prof?.name === prof?.email?.split("@")[0];
+          const hasImages = Array.isArray(prof?.images) && prof.images.length > 0;
+          if (!prof?.name || isStudentId || !hasImages || !prof?.gender) {
+            router.replace("/onboarding");
+            return;
+          }
+        }
+      } catch (e) {
+        console.error("Check onboarding error:", e);
+      }
+    };
+
+    checkOnboarding();
     fetchProfiles();
-  }, []);
+  }, [router]);
 
   const [photoIndex, setPhotoIndex] = useState(0);
   const isDraggingRef = useRef(false);

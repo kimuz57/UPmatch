@@ -64,7 +64,11 @@ export default function OnboardingPage() {
 
         if (res.ok) {
           const data = await res.json();
-          if (data?.profile?.email && data?.profile?.name) {
+          const prof = data?.profile;
+          const isStudentId = /^\d{8}$/.test(prof?.name || "") || prof?.name === prof?.email?.split("@")[0];
+          const hasImages = Array.isArray(prof?.images) && prof.images.length > 0;
+          const hasCompletedOnboarding = prof?.email && prof?.name && !isStudentId && hasImages && prof?.gender;
+          if (hasCompletedOnboarding) {
             router.replace("/swipe");
             return;
           }

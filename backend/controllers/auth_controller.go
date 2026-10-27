@@ -203,7 +203,7 @@ func VerifyOTP(c *fiber.Ctx) error {
 	if err := config.DB.Where("LOWER(email) = ?", cleanEmail).First(&user).Error; err != nil {
 		user = models.User{
 			Email:        cleanEmail,
-			Name:         strings.Split(cleanEmail, "@")[0],
+			Name:         "", // ให้เป็นค่าว่าง เพื่อบังคับให้เข้าหน้า Onboarding ตั้งชื่อเล่นและอัปโหลดรูป
 			AccountType:  "standard",
 			IsPro:        false,
 			ReferralCode: generateReferralCode(cleanEmail),

@@ -2,6 +2,7 @@
 package controllers
 
 import (
+	"sort"
 	"strings"
 	"upmatch-backend/config"
 	"upmatch-backend/models"
@@ -116,17 +117,35 @@ func GetWhoLikesMe(c *fiber.Ctx) error {
 	for _, l := range likes {
 		var user models.User
 		if config.DB.Preload("Images").Where("LOWER(email) = ?", strings.ToLower(l.LikerID)).First(&user).Error == nil {
-			imageURL := firstImageURL(user.Images)
+			sortedImages := make([]models.UserImage, len(user.Images))
+			copy(sortedImages, user.Images)
+			sort.Slice(sortedImages, func(i, j int) bool {
+				return sortedImages[i].DisplayOrder < sortedImages[j].DisplayOrder
+			})
+
+			var allImages []string
+			for _, img := range sortedImages {
+				if img.ImageURL != "" {
+					allImages = append(allImages, formatImageURL(img.ImageURL))
+				}
+			}
+			imageURL := firstImageURL(sortedImages)
 			prof := getProfileByEmail(user.Email)
 			age := calculateAge(prof.BirthDate)
 
 			likers = append(likers, fiber.Map{
-				"id":      user.Email,
-				"name":    user.Name,
-				"image":   imageURL,
-				"faculty": prof.Faculty,
-				"caption": prof.Caption,
-				"age":     age,
+				"id":         user.Email,
+				"name":       user.Name,
+				"image":      imageURL,
+				"images":     allImages,
+				"faculty":    prof.Faculty,
+				"caption":    prof.Caption,
+				"bio":        prof.Caption,
+				"age":        age,
+				"gender":     prof.Gender,
+				"preference": prof.Preference,
+				"hobbies":    prof.Hobbies,
+				"mbti":       prof.MBTI,
 			})
 		}
 	}
