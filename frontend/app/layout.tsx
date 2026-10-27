@@ -11,9 +11,87 @@ const promptFont = Prompt({
   display: "swap",
 });
 
+const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || "https://up-match.tcmg.me";
+
 export const metadata: Metadata = {
-  title: "UP Match - คอมมูนิตี้สำหรับนิสิต มหาวิทยาลัยพะเยา",
-  description: "ค้นหาเพื่อนใหม่ คนรู้ใจ และคอมมูนิตี้เด็ก ม.พะเยา ปลอดภัยด้วยอีเมล @up.ac.th",
+  metadataBase: new URL(siteUrl),
+  title: {
+    default: "UPmatch — เว็บหาคู่ ม.พะเยา ฟรี สำหรับนิสิต",
+    template: "%s | UPmatch",
+  },
+  description:
+    "UPmatch แพลตฟอร์มหาคู่สำหรับนิสิตมหาวิทยาลัยพะเยา หาเพื่อน หาแฟน และหาคนคุย พร้อมดูคนที่กดไลก์และแมตช์กันได้ฟรี",
+  applicationName: "UPmatch",
+  authors: [{ name: "UPmatch Student Project" }],
+  generator: "Next.js",
+  keywords: [
+    "UPmatch",
+    "UP Match",
+    "up-match",
+    "เว็บหาคู่ ม.พะเยา",
+    "หาคู่ ม.พะเยา",
+    "หาแฟน ม.พะเยา",
+    "หาคนคุย ม.พะเยา",
+    "เว็บหาคู่ฟรี",
+    "แพลตฟอร์มหาคู่สำหรับนิสิต",
+    "เด็กพะเยา",
+    "มหาวิทยาลัยพะเยา",
+    "นิสิต ม.พะเยา",
+    "UP dating",
+  ],
+  referrer: "origin-when-cross-origin",
+  creator: "UPmatch Student Project",
+  publisher: "UPmatch",
+  formatDetection: {
+    email: false,
+    address: false,
+    telephone: false,
+  },
+  alternates: {
+    canonical: "/",
+  },
+  openGraph: {
+    title: "UPmatch — เว็บหาคู่ ม.พะเยา ฟรี สำหรับนิสิต",
+    description:
+      "UPmatch แพลตฟอร์มหาคู่สำหรับนิสิตมหาวิทยาลัยพะเยา หาเพื่อน หาแฟน และหาคนคุย พร้อมดูคนที่กดไลก์และแมตช์กันได้ฟรี",
+    url: siteUrl,
+    siteName: "UPmatch",
+    locale: "th_TH",
+    type: "website",
+    images: [
+      {
+        url: "/logo.png",
+        width: 512,
+        height: 512,
+        alt: "UPmatch โลโก้แอปหาคู่ ม.พะเยา",
+      },
+    ],
+  },
+  twitter: {
+    card: "summary",
+    title: "UPmatch — เว็บหาคู่ ม.พะเยา ฟรี สำหรับนิสิต",
+    description:
+      "UPmatch แพลตฟอร์มหาคู่สำหรับนิสิตมหาวิทยาลัยพะเยา หาเพื่อน หาแฟน และหาคนคุย พร้อมดูคนที่กดไลก์และแมตช์กันได้ฟรี",
+    images: ["/logo.png"],
+  },
+  robots: {
+    index: true,
+    follow: true,
+    googleBot: {
+      index: true,
+      follow: true,
+      "max-video-preview": -1,
+      "max-image-preview": "large",
+      "max-snippet": -1,
+    },
+  },
+  icons: {
+    icon: [
+      { url: "/favicon.ico" },
+      { url: "/logo.png", sizes: "192x192", type: "image/png" },
+    ],
+    apple: [{ url: "/logo.png", sizes: "180x180", type: "image/png" }],
+  },
 };
 
 export default function RootLayout({
@@ -21,6 +99,37 @@ export default function RootLayout({
 }: Readonly<{
   children: React.ReactNode;
 }>) {
+  const jsonLd = {
+    "@context": "https://schema.org",
+    "@graph": [
+      {
+        "@type": "WebSite",
+        "@id": `${siteUrl}/#website`,
+        url: siteUrl,
+        name: "UPmatch",
+        alternateName: ["UP Match", "up-match", "UPmatch ม.พะเยา"],
+        description:
+          "UPmatch แพลตฟอร์มหาคู่สำหรับนิสิตมหาวิทยาลัยพะเยา หาเพื่อน หาแฟน และหาคนคุย พร้อมดูคนที่กดไลก์และแมตช์กันได้ฟรี",
+        inLanguage: "th-TH",
+      },
+      {
+        "@type": "WebApplication",
+        "@id": `${siteUrl}/#webapp`,
+        name: "UPmatch",
+        url: siteUrl,
+        applicationCategory: "SocialNetworkingApplication",
+        operatingSystem: "All",
+        offers: {
+          "@type": "Offer",
+          price: "0",
+          priceCurrency: "THB",
+        },
+        description:
+          "เว็บหาคู่ ม.พะเยา ฟรี สำหรับนิสิต ค้นหาเพื่อนใหม่ คนรู้ใจ และคอมมูนิตี้เด็ก มพ. ปลอดภัยด้วยอีเมล @up.ac.th",
+      },
+    ],
+  };
+
   return (
     <html
       lang="th"
@@ -32,8 +141,12 @@ export default function RootLayout({
         <meta name="theme-color" content="#581c87" />
         <meta name="apple-mobile-web-app-capable" content="yes" />
         <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
-        <meta name="apple-mobile-web-app-title" content="UP Match" />
+        <meta name="apple-mobile-web-app-title" content="UPmatch" />
         <link rel="apple-touch-icon" href="/logo.png" />
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
+        />
         <script
           dangerouslySetInnerHTML={{
             __html: `

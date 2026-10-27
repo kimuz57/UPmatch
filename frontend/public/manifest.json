@@ -1,11 +1,11 @@
 {
-  "name": "UP Match - แอปหาเพื่อน มหาวิทยาลัยพะเยา",
-  "short_name": "UP Match",
-  "description": "ค้นหาเพื่อนใหม่ คนรู้ใจ และคอมมูนิตี้เด็ก มพ.",
-  "start_url": "/swipe",
+  "name": "UPmatch — เว็บหาคู่ ม.พะเยา ฟรี สำหรับนิสิต",
+  "short_name": "UPmatch",
+  "description": "UPmatch แพลตฟอร์มหาคู่สำหรับนิสิตมหาวิทยาลัยพะเยา หาเพื่อน หาแฟน และหาคนคุย พร้อมดูคนที่กดไลก์และแมตช์กันได้ฟรี",
+  "start_url": "/",
   "display": "standalone",
-  "background_color": "#faf5ff",
-  "theme_color": "#9333ea",
+  "background_color": "#f8fafc",
+  "theme_color": "#581c87",
   "orientation": "any",
   "icons": [
     {

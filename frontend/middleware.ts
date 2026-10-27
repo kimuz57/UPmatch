@@ -22,6 +22,7 @@ export function middleware(request: NextRequest) {
   // 1. กำหนดหน้าเว็บที่ "ต้องล็อกอิน" เท่านั้นถึงจะเข้าได้
   const isProtectedRoute = 
     path.startsWith('/swipe') || 
+    path.startsWith('/likes') || 
     path.startsWith('/onboarding') || 
     path.startsWith('/chat') || 
     path.startsWith('/matches') || 
@@ -67,8 +68,12 @@ export function middleware(request: NextRequest) {
     return NextResponse.redirect(new URL('/swipe', request.url));
   }
 
-  // ผ่านด่านตรวจ ปล่อยให้เข้าเว็บได้ตามปกติ
-  return NextResponse.next();
+  // ผ่านด่านตรวจ ปล่อยให้เข้าเว็บได้ตามปกติ พร้อมกำหนด X-Robots-Tag สำหรับหน้าที่เป็นความลับ
+  const response = NextResponse.next();
+  if (isProtectedRoute) {
+    response.headers.set('X-Robots-Tag', 'noindex, nofollow, noarchive');
+  }
+  return response;
 }
 
 // กำหนดให้ Middleware ทำงานเฉพาะเส้นทางที่เราสนใจ เพื่อไม่ให้หน่วงเว็บ
@@ -76,6 +81,7 @@ export const config = {
   matcher: [
     '/',
     '/swipe/:path*',
+    '/likes/:path*',
     '/onboarding/:path*',
     '/chat/:path*',
     '/matches/:path*',
