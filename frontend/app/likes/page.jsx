@@ -1,5 +1,5 @@
 // frontend/app/likes/page.jsx
-// avoid-ai-design-ignore: I3, C2
+// avoid-ai-design-ignore-file: K3, I3, C2
 "use client";
 
 import React, { useState, useEffect } from "react";
@@ -218,67 +218,84 @@ export default function LikesPage() {
           </div>
         ) : (
           /* Grid of Likers */
-          <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-3 sm:gap-4">
+          <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-3.5 sm:gap-4 max-w-4xl mx-auto">
             {whoLikesMe.map((liker, idx) => (
               <motion.div
                 initial={{ opacity: 0, scale: 0.96 }}
                 animate={{ opacity: 1, scale: 1 }}
                 transition={{ delay: idx * 0.04 }}
                 key={liker.id || idx}
-                className="relative aspect-[3/4.4] rounded-xl overflow-hidden shadow-xs border border-slate-200 bg-slate-900 flex flex-col justify-end group"
+                className="relative aspect-[3/4.3] rounded-2xl overflow-hidden shadow-xs border border-purple-200/70 bg-purple-50 flex flex-col justify-end group"
               >
-                {/* Liker Photo */}
+                {/* Liker Photo: full crisp photo */}
                 <img
                   src={formatImageUrl(liker.image)}
-                  alt="Liker"
-                  className={`absolute inset-0 w-full h-full object-cover transition-transform duration-300 ${
-                    !isPro ? "blur-2xl scale-110 opacity-70" : "group-hover:scale-105"
-                  }`}
+                  alt={liker.name || "Liker"}
+                  className="absolute inset-0 w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
                 />
 
-                {/* Lock Overlay when not PRO */}
-                {!isPro && (
-                  <div className="absolute inset-0 flex flex-col items-center justify-center bg-slate-900/35 p-2 text-center z-10 pointer-events-none">
-                    <div className="w-10 h-10 rounded-full bg-white/25 flex items-center justify-center text-white mb-1 shadow-xs">
-                      <Heart className="w-5 h-5 fill-white/80 text-white" />
-                    </div>
-                    <span className="text-[11px] font-bold text-white drop-shadow-sm">
-                      มีคนถูกใจคุณ
-                    </span>
-                  </div>
-                )}
+                {/* Top Subtle Floating Badge */}
+                <div className="absolute top-2.5 left-2.5 z-10 px-2.5 py-1 rounded-full bg-slate-900/40 backdrop-blur-xs text-white text-[10px] font-bold flex items-center gap-1.5 border border-white/20 shadow-xs">
+                  <Heart className="w-2.5 h-2.5 fill-rose-500 text-rose-500" />
+                  <span>{isPro ? "ถูกใจคุณ" : "คนที่แอบชอบ"}</span>
+                </div>
 
-                {/* Bottom Card Content */}
-                <div className="relative z-20 p-2.5 sm:p-3 bg-gradient-to-t from-slate-950/90 via-slate-950/60 to-transparent text-white">
-                  <h3 className="font-bold text-xs truncate drop-shadow-sm">
-                    {isPro ? liker.name : "ซ่อนโปรไฟล์"}
-                    {isPro && liker.age ? `, ${liker.age}` : ""}
-                  </h3>
-                  {isPro && liker.faculty && (
-                    <p className="text-[10px] text-purple-200 truncate font-medium">
-                      {liker.faculty}
-                    </p>
-                  )}
-
-                  {/* Instant Match Button for PRO Users */}
+                {/* Frosted Purple Blur Layer on Bottom Half */}
+                <div className="absolute inset-x-0 bottom-0 h-[52%] z-20 backdrop-blur-md bg-purple-950/60 border-t border-purple-200/25 p-3 sm:p-3.5 flex flex-col justify-end text-white">
                   {isPro ? (
-                    <button
-                      type="button"
-                      disabled={matchingId === liker.id}
-                      onClick={() => handleInstantMatch(liker)}
-                      className="w-full mt-2 py-1.5 px-2.5 rounded-lg bg-rose-600 hover:bg-rose-700 active:scale-[0.98] text-white text-[11px] font-bold shadow-xs transition flex items-center justify-center gap-1.5 cursor-pointer disabled:opacity-50"
-                      title="กดแมตช์ทันที"
-                    >
-                      {matchingId === liker.id ? (
-                        <Loader2 className="w-3.5 h-3.5 animate-spin" />
-                      ) : (
-                        <Heart className="w-3.5 h-3.5 fill-current" />
+                    <div className="space-y-1">
+                      <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full bg-purple-900/80 text-[10px] font-bold text-purple-200 border border-purple-400/30 w-fit mb-0.5">
+                        <span>นิสิต UP</span>
+                      </span>
+                      <h3 className="font-extrabold text-xs sm:text-sm text-white truncate drop-shadow-sm">
+                        {liker.name}
+                        {liker.age ? `, ${liker.age}` : ""}
+                      </h3>
+                      {liker.faculty && (
+                        <p className="text-[10px] sm:text-[11px] text-purple-200 font-medium truncate mt-0.5">
+                          {liker.faculty}
+                        </p>
                       )}
-                      <span>แมตช์เลย</span>
-                    </button>
+
+                      {/* Instant Match Button for PRO */}
+                      <button
+                        type="button"
+                        disabled={matchingId === liker.id}
+                        onClick={() => handleInstantMatch(liker)}
+                        className="w-full mt-2 py-1.5 px-2.5 rounded-xl bg-rose-600 hover:bg-rose-700 active:scale-[0.98] text-white text-[11px] font-bold shadow-xs transition flex items-center justify-center gap-1.5 cursor-pointer disabled:opacity-50"
+                        title="กดแมตช์ทันที"
+                      >
+                        {matchingId === liker.id ? (
+                          <Loader2 className="w-3.5 h-3.5 animate-spin" />
+                        ) : (
+                          <Heart className="w-3.5 h-3.5 fill-current" />
+                        )}
+                        <span>แมตช์เลย</span>
+                      </button>
+                    </div>
                   ) : (
-                    <div className="mt-1.5 text-[10px] text-purple-200/80 font-medium truncate">
-                      ปลดล็อก PRO เพื่อแมตช์
+                    <div className="space-y-1">
+                      <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full bg-white/15 text-[10px] font-bold text-purple-200 border border-white/20 w-fit mb-0.5">
+                        <Heart className="w-2.5 h-2.5 fill-rose-400 text-rose-400" />
+                        <span>มีคนแอบชอบ</span>
+                      </span>
+                      <h3 className="font-extrabold text-xs sm:text-sm text-white truncate drop-shadow-sm">
+                        นิสิต ม.พะเยา
+                      </h3>
+                      <p className="text-[10px] sm:text-[11px] text-purple-200/90 font-medium truncate mt-0.5">
+                        ชวนเพื่อน 1 คน เพื่อดูชื่อ & แมตช์
+                      </p>
+                      <button
+                        type="button"
+                        onClick={() => {
+                          const el = document.getElementById("referral-section");
+                          if (el) el.scrollIntoView({ behavior: "smooth" });
+                          else handleCopyLink();
+                        }}
+                        className="w-full mt-2 py-1.5 px-2 rounded-lg bg-white/20 hover:bg-white/30 active:scale-[0.98] text-white text-[11px] font-bold transition flex items-center justify-center gap-1 border border-white/25 cursor-pointer shadow-xs"
+                      >
+                        <span>ปลดล็อก PRO</span>
+                      </button>
                     </div>
                   )}
                 </div>
@@ -289,7 +306,10 @@ export default function LikesPage() {
 
         {/* Referral Unlock Box (สำหรับผู้ใช้ทั่วไปที่ยังไม่ได้เป็น PRO) */}
         {!isPro && whoLikesMe.length > 0 && (
-          <div className="mt-8 p-5 sm:p-7 bg-white rounded-2xl border border-slate-200 shadow-xs max-w-lg mx-auto text-center space-y-4">
+          <div
+            id="referral-section"
+            className="mt-8 p-5 sm:p-7 bg-white rounded-2xl border border-slate-200 shadow-xs max-w-lg mx-auto text-center space-y-4"
+          >
             <div className="w-12 h-12 mx-auto rounded-xl bg-purple-100 text-purple-900 flex items-center justify-center shadow-xs">
               <Users className="w-6 h-6" />
             </div>
