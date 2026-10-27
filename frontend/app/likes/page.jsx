@@ -159,7 +159,11 @@ export default function LikesPage() {
         <Navbar />
       </div>
 
-      <main className="flex-1 min-h-0 overflow-y-auto max-w-5xl mx-auto w-full px-3.5 sm:px-6 py-4 sm:py-6 page-bottom-padding">
+      <main
+        className={`flex-1 min-h-0 overflow-y-auto max-w-5xl mx-auto w-full px-3.5 sm:px-6 py-4 sm:py-6 page-bottom-padding transition-all duration-300 ${
+          !isPro ? "filter blur-sm select-none pointer-events-none" : ""
+        }`}
+      >
         {/* Clean Editorial Header */}
         <div className="mb-6 flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-slate-200 pb-4">
           <div className="flex items-center gap-3">
@@ -286,11 +290,18 @@ export default function LikesPage() {
             ))}
           </div>
         )}
+      </main>
 
-        {/* Referral Unlock Box (สำหรับผู้ใช้ทั่วไปที่ยังไม่ได้เป็น PRO) */}
-        {!isPro && whoLikesMe.length > 0 && (
-          <div className="mt-8 p-5 sm:p-7 bg-white rounded-2xl border border-slate-200 shadow-xs max-w-lg mx-auto text-center space-y-4">
-            <div className="w-12 h-12 mx-auto rounded-xl bg-purple-100 text-purple-900 flex items-center justify-center shadow-xs">
+      {/* Centered PRO Referral Unlock Overlay (แสดงกลางหน้าจอเมื่อยังไม่ได้เป็น PRO) */}
+      {!isPro && (
+        <div className="fixed inset-0 top-14 sm:top-16 z-40 flex items-center justify-center p-4 bg-slate-900/15 pointer-events-auto">
+          <motion.div
+            initial={{ scale: 0.95, opacity: 0 }}
+            animate={{ scale: 1, opacity: 1 }}
+            transition={{ duration: 0.2 }}
+            className="p-6 sm:p-8 bg-white rounded-3xl border border-slate-200 shadow-xl max-w-md w-full text-center space-y-4 relative z-50"
+          >
+            <div className="w-12 h-12 mx-auto rounded-2xl bg-purple-100 text-purple-900 flex items-center justify-center shadow-xs">
               <Users className="w-6 h-6" />
             </div>
 
@@ -298,7 +309,7 @@ export default function LikesPage() {
               <h2 className="text-base sm:text-lg font-black text-slate-900">
                 ชวนเพื่อน 1 คนเพื่อปลดล็อกเป็น PRO ถาวร
               </h2>
-              <p className="text-xs text-slate-600 mt-1 leading-relaxed">
+              <p className="text-xs text-slate-600 mt-1.5 leading-relaxed">
                 ส่งลิงก์ด้านล่างให้เพื่อนนิสิต ม.พะเยา 1 คน เมื่อเพื่อนสมัครสำเร็จ
                 ระบบจะอัปเกรดบัญชีของคุณเป็น PRO ทันที ดูรูปชัดเจนและกดแมตช์ได้ทุกคน
               </p>
@@ -350,9 +361,9 @@ export default function LikesPage() {
               <span className="w-2 h-2 rounded-full bg-rose-600 animate-ping shrink-0" />
               <span>ระบบ Real-time กำลังรอเพื่อน 1 คนสมัครผ่านลิงก์...</span>
             </div>
-          </div>
-        )}
-      </main>
+          </motion.div>
+        </div>
+      )}
 
       {/* Match Success Popup Modal */}
       <AnimatePresence>
