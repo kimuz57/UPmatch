@@ -123,7 +123,7 @@ export default function AuthPage({ onLoginSuccess, onBack }) {
   };
 
   return (
-    <div className="min-h-screen bg-slate-50 text-slate-800 flex items-center justify-center p-4 py-8 relative overflow-y-auto overflow-x-hidden">
+    <div className="min-h-screen bg-transparent text-slate-800 flex items-center justify-center p-4 py-8 relative z-10 overflow-y-auto overflow-x-hidden">
       
       {/* Crisp Solid Card */}
       <div className="max-w-md w-full bg-white border border-slate-200 rounded-2xl p-6 sm:p-8 space-y-6 shadow-sm relative z-10">

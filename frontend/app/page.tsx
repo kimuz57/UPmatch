@@ -38,7 +38,7 @@ export default function LandingPage() {
 
   if (isCheckingSession) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-slate-50">
+      <div className="min-h-screen flex items-center justify-center bg-transparent relative z-10">
         <div className="flex flex-col items-center gap-3">
           <Heart className="w-8 h-8 text-purple-900 animate-pulse fill-purple-900" />
           <p className="text-slate-600 font-medium text-xs tracking-wide">กำลังเข้าสู่ระบบ...</p>
@@ -60,9 +60,9 @@ export default function LandingPage() {
   }
 
   return (
-    <div className="min-h-screen bg-slate-50 text-slate-900 flex flex-col justify-between relative overflow-x-hidden">
+    <div className="min-h-screen bg-transparent text-slate-900 flex flex-col justify-between relative z-10 overflow-x-hidden">
       {/* Top Header */}
-      <header className="w-full max-w-6xl mx-auto px-6 py-5 flex items-center justify-between border-b border-slate-200/80 bg-white">
+      <header className="w-full max-w-6xl mx-auto px-6 py-5 flex items-center justify-between border-b border-slate-200/80 bg-white/85">
         <div className="flex items-center gap-3">
           <div className="w-10 h-10 rounded-xl bg-purple-900 flex items-center justify-center text-white shadow-xs">
             <HeartHandshake className="w-5 h-5" />
@@ -189,7 +189,7 @@ export default function LandingPage() {
         </div>
       </main>
 
-      <footer className="py-6 text-center text-xs font-normal text-slate-500 border-t border-slate-200 bg-white">
+      <footer className="py-6 text-center text-xs font-normal text-slate-500 border-t border-slate-200/80 bg-white/80 relative z-10">
         UP Match • คอมมูนิตี้สังคมออนไลน์สำหรับนิสิตมหาวิทยาลัยพะเยา
       </footer>
     </div>

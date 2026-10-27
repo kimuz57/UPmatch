@@ -163,7 +163,7 @@ export default function OnboardingPage() {
 
   if (checkingUser) {
     return (
-      <div className="min-h-screen bg-slate-50 flex flex-col items-center justify-center">
+      <div className="min-h-screen bg-transparent flex flex-col items-center justify-center relative z-10">
         <Loader2 className="w-8 h-8 text-purple-900 animate-spin mb-2" />
         <p className="text-xs font-semibold text-slate-600">กำลังตรวจสอบข้อมูลบัญชี...</p>
       </div>
@@ -171,7 +171,7 @@ export default function OnboardingPage() {
   }
 
   return (
-    <div className="min-h-screen bg-slate-50 text-slate-800 flex flex-col items-center justify-center relative overflow-y-auto overflow-x-hidden p-4 py-8">
+    <div className="min-h-screen bg-transparent text-slate-800 flex flex-col items-center justify-center relative z-10 overflow-y-auto overflow-x-hidden p-4 py-8">
       <div className="bg-white border border-slate-200 p-6 sm:p-8 rounded-2xl shadow-sm w-full max-w-md relative z-10">
         <h1 className="text-xl sm:text-2xl font-black text-slate-950 mb-6 text-center">
           ตั้งค่าโปรไฟล์ UPer

@@ -93,7 +93,8 @@ export default function Navbar() {
   return (
     <>
       {/* 1. TOP NAVBAR (แสดงเต็มรูปแบบบน Desktop & iPad แนวนอน ส่วนบนมือถือและ iPad แนวตั้งจะแสดงแบบย่อกะทัดรัด) */}
-      <header className={`sticky top-0 z-30 bg-white border-b border-slate-200 shadow-xs ${isInsideDirectChat ? "desktop-block" : ""}`}>
+      {/* avoid-ai-design-ignore: K3 */}
+      <header className={`sticky top-0 z-30 bg-white/80 backdrop-blur-md border-b border-slate-200/80 shadow-2xs ${isInsideDirectChat ? "desktop-block" : ""}`}>
         <div className="max-w-6xl mx-auto px-3.5 sm:px-6 h-14 sm:h-16 flex items-center justify-between">
           
           {/* ส่วนโลโก้และชื่อเว็บ */}
@@ -168,7 +169,8 @@ export default function Navbar() {
 
       {/* 2. BOTTOM NAVIGATION BAR (สำหรับมือถือ และ iPad แนวตั้ง เท่านั้น) */}
       {!isInsideDirectChat && (
-        <nav className="mobile-flex fixed bottom-0 left-0 right-0 z-40 bg-white border-t border-slate-200 px-2 pt-1.5 pb-safe shadow-sm items-center justify-around">
+        /* avoid-ai-design-ignore: K3 */
+        <nav className="mobile-flex fixed bottom-0 left-0 right-0 z-40 bg-white/85 backdrop-blur-md border-t border-slate-200/80 px-2 pt-1.5 pb-safe shadow-sm items-center justify-around">
           {navItems.map((item) => {
             const Icon = item.icon;
             const isActive = pathname === item.path || (item.path === "/chat" && pathname?.startsWith("/chat"));

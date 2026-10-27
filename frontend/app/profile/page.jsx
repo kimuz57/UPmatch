@@ -457,7 +457,7 @@ export default function ProfilePage() {
   const displayAge = calculateAgeFromProfile(profile);
 
   return (
-    <div className="h-dvh max-h-screen bg-slate-50 text-slate-800 flex flex-col overflow-hidden">
+    <div className="h-dvh max-h-screen bg-transparent text-slate-800 flex flex-col overflow-hidden relative z-10">
       <div className="shrink-0 z-30">
         <Navbar />
       </div>

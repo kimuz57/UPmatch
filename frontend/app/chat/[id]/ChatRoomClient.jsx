@@ -524,7 +524,7 @@ export default function ChatRoomClient({ targetEmail }) {
   const displayAge = getAge();
 
   return (
-    <div className="fixed inset-0 h-dvh max-h-screen bg-slate-50 text-slate-800 flex flex-col overflow-hidden">
+    <div className="fixed inset-0 h-dvh max-h-screen bg-transparent text-slate-800 flex flex-col overflow-hidden relative z-10">
       <div className="shrink-0 z-30 desktop-block">
         <Navbar />
       </div>
