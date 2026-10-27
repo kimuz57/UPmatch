@@ -102,14 +102,14 @@ export default function Navbar() {
             <img
               src="/logo.png"
               alt="UP Match Logo"
-              className="w-9 h-9 sm:w-10 sm:h-10 object-contain shrink-0"
+              className="w-12 h-12 sm:w-10 sm:h-10 object-contain shrink-0"
             />
             <div className="leading-tight">
               <span className="font-black text-base sm:text-lg tracking-tight text-purple-950">
                 UP Match
               </span>
               <span className="hidden sm:block text-[10px] font-bold text-purple-800">
-                UP Community
+                Just Match, The Right Person
               </span>
             </div>
           </Link>

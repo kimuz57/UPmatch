@@ -153,8 +153,18 @@ export default function LandingPage() {
         </div>
       </main>
 
-      <footer className="py-6 text-center text-xs font-normal text-slate-500 border-t border-slate-200/80 bg-white/80 relative z-10">
-        UP Match • คอมมูนิตี้สังคมออนไลน์สำหรับนิสิตมหาวิทยาลัยพะเยา
+      <footer className="py-8 px-4 text-center text-slate-500 border-t border-slate-200/80 bg-white/80 relative z-10">
+        <div className="max-w-3xl mx-auto space-y-2.5">
+          <p className="text-xs font-bold text-slate-700">
+            UP Match • Just Match, The Right Person
+          </p>
+          <p className="text-[11px] text-slate-500 leading-relaxed font-normal">
+            <strong className="font-semibold text-slate-700">ข้อจำกัดความรับผิดชอบ (Disclaimer):</strong> เว็บไซต์ UP Match เป็นโครงงานอิสระที่พัฒนาขึ้นโดยนิสิตเพื่อการศึกษาและพัฒนาทักษะการทำเว็บแอปพลิเคชันเท่านั้น <strong className="font-semibold text-slate-700">ไม่มีความเกี่ยวข้อง ดำเนินการ หรือได้รับการรับรองอย่างเป็นทางการจากมหาวิทยาลัยพะเยา</strong> ผู้พัฒนาไม่มีส่วนเกี่ยวข้องและไม่รับผิดชอบต่อพฤติกรรม ข้อพิพาท หรือความเสียหายใดๆ ที่เกิดขึ้นระหว่างผู้ใช้งาน โปรดใช้ความระมัดระวังในการสนทนาและปกป้องข้อมูลส่วนบุคคลของท่าน
+          </p>
+          <p className="text-[10px] text-slate-400">
+            © 2026 UP Match Student Project. All rights reserved.
+          </p>
+        </div>
       </footer>
     </div>
   );
