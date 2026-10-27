@@ -12,6 +12,8 @@ import {
   ArrowLeft,
   Check,
   CheckCircle2,
+  ShieldAlert,
+  X,
 } from "lucide-react";
 import { parseStudentEmail } from "../utils/emailParser";
 import { getApiBaseUrl } from "../utils/api";
@@ -23,6 +25,7 @@ export default function AuthPage({ onLoginSuccess, onBack }) {
   const [loading, setLoading] = useState(false);
   const [errorMsg, setErrorMsg] = useState("");
   const [infoMsg, setInfoMsg] = useState("");
+  const [showDisclaimer, setShowDisclaimer] = useState(false);
 
   const email = useMemo(() => {
     const clean = studentId.trim();
@@ -40,16 +43,22 @@ export default function AuthPage({ onLoginSuccess, onBack }) {
     setStudentId(val);
   };
 
-  const handleSendOtp = async (e) => {
+  const handleRequestOtpSubmit = (e) => {
     e.preventDefault();
     if (!parsed.isValidUpEmail) {
       setErrorMsg(parsed.error);
       return;
     }
-
-    setLoading(true);
     setErrorMsg("");
-    setInfoMsg("");
+    setShowDisclaimer(true);
+  };
+
+  const handleConfirmDisclaimer = async () => {
+    setShowDisclaimer(false);
+    await doSendOtp();
+  };
+
+  const doSendOtp = async () => {
 
     try {
       const res = await fetch(`${getApiBaseUrl()}/api/v1/auth/send-otp`, {
@@ -222,7 +231,7 @@ export default function AuthPage({ onLoginSuccess, onBack }) {
         )}
 
         {step === "email" ? (
-          <form onSubmit={handleSendOtp} className="space-y-4">
+          <form onSubmit={handleRequestOtpSubmit} className="space-y-4">
             <div>
               <div className="flex items-center justify-between mb-1.5">
                 <label className="block text-xs font-bold text-slate-700">
@@ -319,6 +328,100 @@ export default function AuthPage({ onLoginSuccess, onBack }) {
           </form>
         )}
       </div>
+
+      {/* Disclaimer & Terms Modal before sending OTP */}
+      {showDisclaimer && (
+        <div className="fixed inset-0 z-50 bg-slate-900/60 flex items-center justify-center p-4">
+          <div className="bg-white rounded-2xl max-w-lg w-full p-5 sm:p-6 shadow-xl border border-slate-200 max-h-[88vh] overflow-y-auto">
+            <div className="flex items-center justify-between pb-3.5 border-b border-slate-100 mb-4">
+              <div className="flex items-center gap-2.5">
+                <div className="w-8 h-8 rounded-lg bg-amber-100 text-amber-900 flex items-center justify-center shrink-0">
+                  <ShieldAlert className="w-4 h-4" />
+                </div>
+                <div>
+                  <h2 className="text-sm sm:text-base font-black text-slate-900">
+                    ข้อกำหนดและข้อจำกัดความรับผิดชอบ
+                  </h2>
+                  <p className="text-[11px] text-slate-500 font-medium">UP Match Independent Student Project</p>
+                </div>
+              </div>
+              <button
+                type="button"
+                onClick={() => setShowDisclaimer(false)}
+                className="p-1 rounded-lg hover:bg-slate-100 text-slate-400 hover:text-slate-700 cursor-pointer"
+              >
+                <X className="w-5 h-5" />
+              </button>
+            </div>
+
+            <div className="space-y-3.5 text-xs text-slate-600 leading-relaxed">
+              <div className="p-3 bg-amber-50/70 border border-amber-200/80 rounded-xl space-y-1">
+                <h3 className="font-bold text-amber-950 flex items-center gap-1.5">
+                  1. การไม่มีความเกี่ยวข้องกับมหาวิทยาลัย (No Official Affiliation)
+                </h3>
+                <p className="text-[11px] text-amber-900 leading-normal">
+                  เว็บไซต์ UP Match เป็นโครงงานอิสระที่พัฒนาขึ้นโดยนิสิต <strong>ไม่มีความเกี่ยวข้อง ไม่ได้รับการสนับสนุน และไม่ได้ดำเนินการอย่างเป็นทางการโดยมหาวิทยาลัยพะเยา (University of Phayao)</strong> ชื่อมหาวิทยาลัยหรือคำเรียกถูกนำมาใช้เพื่อระบุกลุ่มเป้าหมายเชิงพื้นที่เท่านั้น
+                </p>
+              </div>
+
+              <div className="space-y-1">
+                <h3 className="font-bold text-slate-900">
+                  2. วัตถุประสงค์ของโครงการ (Educational Purpose)
+                </h3>
+                <p className="text-slate-600">
+                  โครงการนี้จัดทำขึ้นเพื่อการศึกษา ค้นคว้า และพัฒนาทักษะด้าน Software Engineering และการพัฒนาเว็บแอปพลิเคชัน รวมถึงเป็นพื้นที่สื่อกลางช่วยให้นิสิตในมหาวิทยาลัยทำความรู้จักและสร้างมิตรภาพเชิงสร้างสรรค์
+                </p>
+              </div>
+
+              <div className="space-y-1">
+                <h3 className="font-bold text-slate-900">
+                  3. ข้อจำกัดความรับผิดชอบ (Limitation of Liability)
+                </h3>
+                <p className="text-slate-600">
+                  ผู้พัฒนาไม่มีส่วนเกี่ยวข้องและไม่รับผิดชอบต่อพฤติกรรม ข้อความ การสนทนา การนัดหมาย หรือความเสียหายใดๆ ทั้งทางตรงและทางอ้อมที่เกิดขึ้นระหว่างผู้ใช้งาน ผู้ใช้บริการพึงใช้วิจารณญาณส่วนบุคคลในการตัดสินใจและติดต่อสื่อสาร
+                </p>
+              </div>
+
+              <div className="p-3 bg-slate-50 border border-slate-200 rounded-xl space-y-1.5">
+                <h3 className="font-bold text-slate-900">
+                  4. คำแนะนำเพื่อความปลอดภัย (Safety Guidelines)
+                </h3>
+                <ul className="list-disc list-inside space-y-0.5 text-[11px] text-slate-600">
+                  <li><strong>ห้ามโอนเงิน</strong> หรือให้ข้อมูลทางการเงิน เลขบัญชี หรือรหัสผ่านแก่ผู้อื่นโดยเด็ดขาด</li>
+                  <li>ระมัดระวังการเปิดเผยข้อมูลส่วนบุคคลหรือสถานที่พักอาศัยแก่คนแปลกหน้า</li>
+                  <li>หากมีการนัดพบ ควรนัดพบในเวลากลางวันและสถานที่สาธารณะที่มีผู้คนสัญจร</li>
+                </ul>
+              </div>
+
+              <div className="space-y-1">
+                <h3 className="font-bold text-slate-900">
+                  5. ข้อมูลส่วนบุคคล (Data Privacy)
+                </h3>
+                <p className="text-[11px] text-slate-500">
+                  อีเมลสถาบัน <strong className="text-slate-700">{email}</strong> จะใช้เพื่อวัตถุประสงค์ในการจัดส่งรหัสยืนยัน OTP เพื่อยืนยันสถานะนิสิตเท่านั้น ระบบไม่มีนโยบายจำหน่าย ส่งต่อ หรือเปิดเผยข้อมูลของท่านแก่บุคคลภายนอก
+                </p>
+              </div>
+            </div>
+
+            <div className="mt-5 pt-3 border-t border-slate-100 flex flex-col-reverse sm:flex-row items-stretch sm:items-center justify-end gap-2">
+              <button
+                type="button"
+                onClick={() => setShowDisclaimer(false)}
+                className="w-full sm:w-auto px-4 py-2.5 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold text-xs cursor-pointer transition"
+              >
+                ยกเลิก
+              </button>
+              <button
+                type="button"
+                onClick={handleConfirmDisclaimer}
+                className="w-full sm:w-auto px-5 py-2.5 rounded-xl bg-purple-900 hover:bg-purple-950 text-white font-bold text-xs shadow-xs cursor-pointer transition active:scale-98"
+              >
+                รับทราบและเข้าใจข้อตกลง
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
