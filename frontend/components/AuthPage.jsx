@@ -260,7 +260,7 @@ export default function AuthPage({ onLoginSuccess, onBack }) {
                   maxLength={8}
                   value={studentId}
                   onChange={handleStudentIdChange}
-                  placeholder="เช่น 67021589"
+                  placeholder="รหัสนิสิต"
                   className="w-full py-3 pr-2 bg-transparent text-sm font-semibold tracking-wider text-slate-900 placeholder:text-slate-400 placeholder:font-normal placeholder:tracking-normal focus:outline-none"
                   required
                   autoFocus
