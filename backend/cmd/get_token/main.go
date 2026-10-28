@@ -17,7 +17,7 @@ import (
 
 func main() {
 	fmt.Println("==================================================")
-	fmt.Println("🔑 เครื่องมือรับ Google OAuth Token สำหรับ UP Match")
+	fmt.Println("🔑 เครื่องมือรับ Google OAuth Token สำหรับ UPyes")
 	fmt.Println("==================================================")
 
 	credFile := "credentials.json"

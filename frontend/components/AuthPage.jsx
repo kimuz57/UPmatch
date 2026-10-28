@@ -164,10 +164,10 @@ export default function AuthPage({ onLoginSuccess, onBack }) {
 
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-2.5">
-            <img src="/logo.png" alt="UP Match" className="w-14 h-14" />
+            <img src="/logo.png" alt="UPyes" className="w-14 h-14" />
             <div>
               <span className="text-xl font-black tracking-tight text-slate-900">
-                UP Match
+                UPyes
               </span>
               <span className="block text-[10px] font-bold text-purple-800">
                 
@@ -342,7 +342,7 @@ export default function AuthPage({ onLoginSuccess, onBack }) {
                   <h2 className="text-sm sm:text-base font-black text-slate-900">
                     ข้อกำหนดและข้อจำกัดความรับผิดชอบ
                   </h2>
-                  <p className="text-[11px] text-slate-500 font-medium">UP Match Independent Student Project</p>
+                  <p className="text-[11px] text-slate-500 font-medium">UPyes Independent Student Project</p>
                 </div>
               </div>
               <button
@@ -360,7 +360,7 @@ export default function AuthPage({ onLoginSuccess, onBack }) {
                   1. การไม่มีความเกี่ยวข้องกับมหาวิทยาลัย (No Official Affiliation)
                 </h3>
                 <p className="text-[11px] text-amber-900 leading-normal">
-                  เว็บไซต์ UP Match เป็นโครงงานอิสระที่พัฒนาขึ้นโดยนิสิต <strong>ไม่มีความเกี่ยวข้อง ไม่ได้รับการสนับสนุน และไม่ได้ดำเนินการอย่างเป็นทางการโดยมหาวิทยาลัยพะเยา (University of Phayao)</strong> ชื่อมหาวิทยาลัยหรือคำเรียกถูกนำมาใช้เพื่อระบุกลุ่มเป้าหมายเชิงพื้นที่เท่านั้น
+                  เว็บไซต์ UPyes เป็นโครงงานอิสระที่พัฒนาขึ้นโดยนิสิต <strong>ไม่มีความเกี่ยวข้อง ไม่ได้รับการสนับสนุน และไม่ได้ดำเนินการอย่างเป็นทางการโดยมหาวิทยาลัยพะเยา (University of Phayao)</strong> ชื่อมหาวิทยาลัยหรือคำเรียกถูกนำมาใช้เพื่อระบุกลุ่มเป้าหมายเชิงพื้นที่เท่านั้น
                 </p>
               </div>
 

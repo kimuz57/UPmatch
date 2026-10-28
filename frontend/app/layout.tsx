@@ -16,18 +16,20 @@ const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || "https://upmatch.tcmg.me";
 export const metadata: Metadata = {
   metadataBase: new URL(siteUrl),
   title: {
-    default: "UPmatch — เว็บหาคู่ ม.พะเยา ฟรี สำหรับนิสิต",
-    template: "%s | UPmatch",
+    default: "UPyes — เว็บหาคู่ ม.พะเยา ฟรี สำหรับนิสิต",
+    template: "%s | UPyes",
   },
   description:
-    "UPmatch แพลตฟอร์มหาคู่สำหรับนิสิตมหาวิทยาลัยพะเยา หาเพื่อน หาแฟน และหาคนคุย พร้อมดูคนที่กดไลก์และแมตช์กันได้ฟรี",
-  applicationName: "UPmatch",
+    "UPyes แพลตฟอร์มหาคู่สำหรับนิสิตมหาวิทยาลัยพะเยา หาเพื่อน หาแฟน และหาคนคุย พร้อมดูคนที่กดไลก์และแมตช์กันได้ฟรี",
+  applicationName: "UPyes",
   authors: [{ name: "Suphakit Saeyang", url: "https://tcmg.me" }],
   generator: "Next.js",
   keywords: [
+    "UPyes",
+    "UP Yes",
+    "up-yes",
     "UPmatch",
     "UP Match",
-    "up-match",
     "เว็บหาคู่ ม.พะเยา",
     "หาคู่ ม.พะเยา",
     "หาแฟน ม.พะเยา",
@@ -53,11 +55,11 @@ export const metadata: Metadata = {
     canonical: "/",
   },
   openGraph: {
-    title: "UPmatch — เว็บหาคู่ ม.พะเยา ฟรี สำหรับนิสิต",
+    title: "UPyes — เว็บหาคู่ ม.พะเยา ฟรี สำหรับนิสิต",
     description:
-      "UPmatch แพลตฟอร์มหาคู่สำหรับนิสิตมหาวิทยาลัยพะเยา หาเพื่อน หาแฟน และหาคนคุย พร้อมดูคนที่กดไลก์และแมตช์กันได้ฟรี",
+      "UPyes แพลตฟอร์มหาคู่สำหรับนิสิตมหาวิทยาลัยพะเยา หาเพื่อน หาแฟน และหาคนคุย พร้อมดูคนที่กดไลก์และแมตช์กันได้ฟรี",
     url: siteUrl,
-    siteName: "UPmatch",
+    siteName: "UPyes",
     locale: "th_TH",
     type: "website",
     images: [
@@ -65,15 +67,15 @@ export const metadata: Metadata = {
         url: "/logo.png",
         width: 512,
         height: 512,
-        alt: "UPmatch โลโก้แอปหาคู่ ม.พะเยา",
+        alt: "UPyes โลโก้แอปหาคู่ ม.พะเยา",
       },
     ],
   },
   twitter: {
     card: "summary",
-    title: "UPmatch — เว็บหาคู่ ม.พะเยา ฟรี สำหรับนิสิต",
+    title: "UPyes — เว็บหาคู่ ม.พะเยา ฟรี สำหรับนิสิต",
     description:
-      "UPmatch แพลตฟอร์มหาคู่สำหรับนิสิตมหาวิทยาลัยพะเยา หาเพื่อน หาแฟน และหาคนคุย พร้อมดูคนที่กดไลก์และแมตช์กันได้ฟรี",
+      "UPyes แพลตฟอร์มหาคู่สำหรับนิสิตมหาวิทยาลัยพะเยา หาเพื่อน หาแฟน และหาคนคุย พร้อมดูคนที่กดไลก์และแมตช์กันได้ฟรี",
     images: ["/logo.png"],
   },
   robots: {
@@ -108,16 +110,16 @@ export default function RootLayout({
         "@type": "WebSite",
         "@id": `${siteUrl}/#website`,
         url: siteUrl,
-        name: "UPmatch",
-        alternateName: ["UP Match", "up-match", "UPmatch ม.พะเยา"],
+        name: "UPyes",
+        alternateName: ["UP Yes", "up-yes", "UPyes ม.พะเยา", "UPmatch", "UP Match"],
         description:
-          "UPmatch แพลตฟอร์มหาคู่สำหรับนิสิตมหาวิทยาลัยพะเยา หาเพื่อน หาแฟน และหาคนคุย พร้อมดูคนที่กดไลก์และแมตช์กันได้ฟรี",
+          "UPyes แพลตฟอร์มหาคู่สำหรับนิสิตมหาวิทยาลัยพะเยา หาเพื่อน หาแฟน และหาคนคุย พร้อมดูคนที่กดไลก์และแมตช์กันได้ฟรี",
         inLanguage: "th-TH",
       },
       {
         "@type": "WebApplication",
         "@id": `${siteUrl}/#webapp`,
-        name: "UPmatch",
+        name: "UPyes",
         url: siteUrl,
         applicationCategory: "SocialNetworkingApplication",
         operatingSystem: "All",
@@ -168,7 +170,7 @@ export default function RootLayout({
         <meta name="theme-color" content="#581c87" />
         <meta name="apple-mobile-web-app-capable" content="yes" />
         <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
-        <meta name="apple-mobile-web-app-title" content="UPmatch" />
+        <meta name="apple-mobile-web-app-title" content="UPyes" />
         <link rel="apple-touch-icon" href="/logo.png" />
         <script
           type="application/ld+json"

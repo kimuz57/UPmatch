@@ -614,7 +614,7 @@ func SendMessage(c *fiber.Ctx) error {
 	config.DB.Preload("Images").Where("LOWER(email) = ?", strings.ToLower(myEmail)).First(&sender)
 	senderName := sender.Name
 	if senderName == "" {
-		senderName = "เพื่อนใน UP Match"
+		senderName = "เพื่อนใน UPyes"
 	}
 	pushText := content
 	if isMediaURL(content) {

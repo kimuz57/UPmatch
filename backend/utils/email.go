@@ -179,8 +179,8 @@ func SendEmailOTPWithGmailAPI(toEmail string, otp string) error {
 	}
 
 	// เพิ่ม base64 encoding ให้หัวข้ออีเมล
-	encodedSubject := "=?utf-8?B?" + base64.StdEncoding.EncodeToString([]byte("รหัสยืนยันตัวตน UP Match ของคุณ")) + "?="
-	body := fmt.Sprintf("รหัส OTP สำหรับเข้าสู่ระบบ UP Match คือ: <b>%s</b><br>รหัสนี้มีอายุการใช้งาน 5 นาที<br><br><i>โปรดอย่าให้รหัสนี้แก่ผู้อื่น</i>", otp)
+	encodedSubject := "=?utf-8?B?" + base64.StdEncoding.EncodeToString([]byte("รหัสยืนยันตัวตน UPyes ของคุณ")) + "?="
+	body := fmt.Sprintf("รหัส OTP สำหรับเข้าสู่ระบบ UPyes คือ: <b>%s</b><br>รหัสนี้มีอายุการใช้งาน 5 นาที<br><br><i>โปรดอย่าให้รหัสนี้แก่ผู้อื่น</i>", otp)
 	msgStr := fmt.Sprintf("To: %s\r\nSubject: %s\r\nContent-Type: text/html; charset=\"UTF-8\"\r\n\r\n%s", toEmail, encodedSubject, body)
 
 	msg := []byte(msgStr)

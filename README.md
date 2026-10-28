@@ -1,7 +1,7 @@
-# 💜 UP Match - เว็บแอปพลิเคชันหาเพื่อน & คนรู้ใจ นิสิตมหาวิทยาลัยพะเยา
+# 💜 UPyes - เว็บแอปพลิเคชันหาเพื่อน & คนรู้ใจ นิสิตมหาวิทยาลัยพะเยา
 
 <p align="center">
-  <img src="frontend/public/logo.png" alt="UP Match Logo" width="140" style="border-radius: 24px; box-shadow: 0 10px 25px rgba(168, 85, 247, 0.25);" />
+  <img src="frontend/public/logo.png" alt="UPyes Logo" width="140" style="border-radius: 24px; box-shadow: 0 10px 25px rgba(168, 85, 247, 0.25);" />
 </p>
 
 <p align="center">
@@ -148,7 +148,7 @@ UPER/
 │   ├── public/
 │   │   ├── manifest.json            # PWA Web App Manifest
 │   │   ├── sw.js                    # Service Worker สำหรับ Background Web Push
-│   │   └── logo.png                 # โลโก้แอปพลิเคชัน UP Match
+│   │   └── logo.png                 # โลโก้แอปพลิเคชัน UPyes
 │   ├── utils/
 │   │   ├── api.js                   # ดึง Base URL และจัดการพาธรูปภาพผ่าน .env
 │   │   └── session.js               # สร้าง Cryptographic Signature ป้องกันลิงก์แชท
@@ -318,7 +318,7 @@ UPER/
 
 ## 👨‍💻 ผู้พัฒนาและที่มา (Authors & Credits)
 
-- **โครงการ:** UP Match - มหาวิทยาลัยพะเยา (UP Community Project)
+- **โครงการ:** UPyes - มหาวิทยาลัยพะเยา (UP Community Project)
 - **GitHub Repository:** [kimuz57/UPmatch](https://github.com/kimuz57/UPmatch)
 - **Licence:** MIT License
 

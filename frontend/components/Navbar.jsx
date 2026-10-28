@@ -101,12 +101,12 @@ export default function Navbar() {
           <Link href="/swipe" className="flex items-center gap-2 sm:gap-3 cursor-pointer">
             <img
               src="/logo.png"
-              alt="UP Match Logo"
+              alt="UPyes Logo"
               className="w-12 h-12 sm:w-10 sm:h-10 object-contain shrink-0"
             />
             <div className="leading-tight">
               <span className="font-black text-base sm:text-lg tracking-tight text-purple-950">
-                UP Match
+                UPyes
               </span>
               <span className="hidden sm:block text-[10px] font-bold text-purple-800">
                 Just Match, The Right Person

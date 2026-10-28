@@ -253,7 +253,7 @@ export default function GlobalNotification() {
 
               showToast({
                 type: "message",
-                title: data.sender_name || "เพื่อนใน UP Match",
+                title: data.sender_name || "เพื่อนใน UPyes",
                 content: displayContent,
                 image: data.sender_image || "/logo.png",
                 link: `/chat/${data.sender_hash || data.sender_id}`,
@@ -263,7 +263,7 @@ export default function GlobalNotification() {
 
             // ยิง Native Notification เมื่อผู้ใช้ไม่ได้เปิดแท็บนี้อยู่
             if (document.hidden && typeof window !== "undefined" && "Notification" in window && Notification.permission === "granted") {
-              const notif = new Notification(data.sender_name || "UP Match", {
+              const notif = new Notification(data.sender_name || "UPyes", {
                 body: data.content || "ส่งข้อความใหม่ถึงคุณ",
                 icon: formatImageUrl(data.sender_image) || "/logo.png",
               });
@@ -320,7 +320,7 @@ export default function GlobalNotification() {
             // ยิง Native Notification
             if (typeof window !== "undefined" && "Notification" in window && Notification.permission === "granted") {
               const matched = data.matched_user || {};
-              const notif = new Notification("ใจตรงกันแล้ว UP Match", {
+              const notif = new Notification("ใจตรงกันแล้ว UPyes", {
                 body: `คุณกับ ${matched.name || "เพื่อนใหม่"} ใจตรงกันแล้ว เริ่มแชทได้เลย!`,
                 icon: formatImageUrl(matched.image) || "/logo.png",
               });

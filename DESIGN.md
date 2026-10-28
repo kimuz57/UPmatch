@@ -1,6 +1,6 @@
 ---
 version: 1.0.0
-name: UP Match
+name: UPyes
 description: Authentic campus dating and friend-finding platform for University of Phayao students.
 colors:
   ground: "#F8FAFC"       # Clean, bright slate-50 ground surface
@@ -31,7 +31,7 @@ rounded:
 
 ## Overview
 
-UP Match connects University of Phayao students for meals, study sessions, and dating. The design draws from campus vibrancy, Kwan Phayao lakeside tranquility, and authentic student culture. It deliberately rejects generic "AI slop" clichés: no purple-to-pink neon gradients, no `bg-clip-text` headline gradients, no indiscriminate glassmorphism on opaque surfaces, no colored glowing shadows, and no generic sparkle emojis.
+UPyes connects University of Phayao students for meals, study sessions, and dating. The design draws from campus vibrancy, Kwan Phayao lakeside tranquility, and authentic student culture. It deliberately rejects generic "AI slop" clichés: no purple-to-pink neon gradients, no `bg-clip-text` headline gradients, no indiscriminate glassmorphism on opaque surfaces, no colored glowing shadows, and no generic sparkle emojis.
 
 ## Colors
 

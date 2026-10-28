@@ -61,10 +61,10 @@ export default function LandingPage() {
       {/* Top Header */}
       <header className="w-full max-w-6xl mx-auto px-6 py-5 flex items-center justify-between border-b border-slate-200/80 bg-white/85">
         <div className="flex items-center gap-3">
-          <img src="/logo.png" alt="UPmatch โลโก้เว็บหาคู่ ม.พะเยา" className="w-14 h-14" />
+          <img src="/logo.png" alt="UPyes โลโก้เว็บหาคู่ ม.พะเยา" className="w-14 h-14" />
           <div>
             <span className="text-lg font-black tracking-tight text-slate-950">
-              UPmatch
+              UPyes
             </span>
             <span className="block text-[11px] font-semibold text-purple-900">
               Just Match, The Right Person
@@ -79,11 +79,11 @@ export default function LandingPage() {
           {/* Left Column: Editorial Headline & Actions */}
           <div className="lg:col-span-7 text-left space-y-6">
             <h1 className="text-2xl sm:text-3xl lg:text-4xl font-black tracking-tight text-slate-950 leading-snug">
-              UPmatch — เว็บหาคู่ ม.พะเยา พื้นที่หาเพื่อน หาแฟน และหาคนคุยสำหรับนิสิต
+              UPyes — เว็บหาคู่ ม.พะเยา พื้นที่หาเพื่อน หาแฟน และหาคนคุยสำหรับนิสิต
             </h1>
 
             <p className="text-base sm:text-lg text-slate-600 leading-relaxed font-normal max-w-xl">
-              UPmatch คือแพลตฟอร์มหาคู่สำหรับนิสิตมหาวิทยาลัยพะเยา ใช้งานฟรี ปลอดภัยด้วยการยืนยันตัวตนผ่าน OTP ด้วยอีเมลสถาบัน @up.ac.th ปราศจากบัญชีปลอม เปิดโอกาสให้คุณได้ค้นหาเพื่อนร่วมคณะ หาคนคุย ติวหนังสือ หรือพัฒนาความสัมพันธ์ไปเป็นคนรู้ใจ
+              UPyes คือแพลตฟอร์มหาคู่สำหรับนิสิตมหาวิทยาลัยพะเยา ใช้งานฟรี ปลอดภัยด้วยการยืนยันตัวตนผ่าน OTP ด้วยอีเมลสถาบัน @up.ac.th ปราศจากบัญชีปลอม เปิดโอกาสให้คุณได้ค้นหาเพื่อนร่วมคณะ หาคนคุย ติวหนังสือ หรือพัฒนาความสัมพันธ์ไปเป็นคนรู้ใจ
             </p>
 
             <div className="pt-2 flex flex-col sm:flex-row items-stretch sm:items-center gap-3.5">
@@ -91,7 +91,7 @@ export default function LandingPage() {
                 onClick={() => setShowAuth(true)}
                 className="px-7 py-3.5 rounded-xl bg-purple-900 hover:bg-purple-950 text-white font-bold text-base shadow-xs transition active:scale-[0.99] cursor-pointer text-center"
               >
-                เริ่มต้นใช้งาน UPmatch ฟรี
+                เริ่มต้นใช้งาน UPyes ฟรี
               </button>
               <span className="text-xs text-slate-500 font-medium self-center sm:self-auto">
                 เว็บหาคู่ฟรีสำหรับนิสิต ม.พะเยา ทุกชั้นปี
@@ -101,7 +101,7 @@ export default function LandingPage() {
 
           {/* Right Column: Campus Mock Card */}
           <div className="lg:col-span-5 flex justify-center">
-            <img src="/jpg.jpg" alt="UPmatch ตัวอย่างหน้าต่างค้นหาและปัดการ์ดหาคู่สำหรับนิสิต ม.พะเยา" />
+            <img src="/jpg.jpg" alt="UPyes ตัวอย่างหน้าต่างค้นหาและปัดการ์ดหาคู่สำหรับนิสิต ม.พะเยา" />
           </div>
 
         </div>
@@ -113,7 +113,7 @@ export default function LandingPage() {
               ฟีเจอร์เด่นของแพลตฟอร์ม
             </span>
             <h2 className="text-2xl sm:text-3xl font-black text-slate-950 tracking-tight">
-              ทำไมต้องเลือก UPmatch เว็บหาคู่สำหรับนิสิต ม.พะเยา
+              ทำไมต้องเลือก UPyes เว็บหาคู่สำหรับนิสิต ม.พะเยา
             </h2>
           </div>
 
@@ -154,10 +154,10 @@ export default function LandingPage() {
       <footer className="py-8 px-4 text-center text-slate-500 border-t border-slate-200/80 bg-white/80 relative z-10">
         <div className="max-w-3xl mx-auto space-y-3">
           <p className="text-xs font-bold text-slate-700">
-            UP Match • Just Match, The Right Person
+            UPyes • Just Match, The Right Person
           </p>
           <p className="text-[11px] text-slate-500 leading-relaxed font-normal">
-            <strong className="font-semibold text-slate-700">ข้อจำกัดความรับผิดชอบ (Disclaimer):</strong> เว็บไซต์ UP Match เป็นโครงงานอิสระที่พัฒนาขึ้นโดยนิสิตเพื่อการศึกษาและพัฒนาทักษะการทำเว็บแอปพลิเคชันเท่านั้น <strong className="font-semibold text-slate-700">ไม่มีความเกี่ยวข้อง ดำเนินการ หรือได้รับการรับรองอย่างเป็นทางการจากมหาวิทยาลัยพะเยา</strong> ผู้พัฒนาไม่มีส่วนเกี่ยวข้องและไม่รับผิดชอบต่อพฤติกรรม ข้อพิพาท หรือความเสียหายใดๆ ที่เกิดขึ้นระหว่างผู้ใช้งาน โปรดใช้ความระมัดระวังในการสนทนาและปกป้องข้อมูลส่วนบุคคลของท่าน
+            <strong className="font-semibold text-slate-700">ข้อจำกัดความรับผิดชอบ (Disclaimer):</strong> เว็บไซต์ UPyes เป็นโครงงานอิสระที่พัฒนาขึ้นโดยนิสิตเพื่อการศึกษาและพัฒนาทักษะการทำเว็บแอปพลิเคชันเท่านั้น <strong className="font-semibold text-slate-700">ไม่มีความเกี่ยวข้อง ดำเนินการ หรือได้รับการรับรองอย่างเป็นทางการจากมหาวิทยาลัยพะเยา</strong> ผู้พัฒนาไม่มีส่วนเกี่ยวข้องและไม่รับผิดชอบต่อพฤติกรรม ข้อพิพาท หรือความเสียหายใดๆ ที่เกิดขึ้นระหว่างผู้ใช้งาน โปรดใช้ความระมัดระวังในการสนทนาและปกป้องข้อมูลส่วนบุคคลของท่าน
           </p>
 
           <div className="pt-2 border-t border-slate-200/60 flex flex-wrap items-center justify-center gap-x-3 sm:gap-x-4 gap-y-1.5 text-[11px] text-slate-600">
@@ -165,7 +165,7 @@ export default function LandingPage() {
               href="/about"
               className="text-purple-900 hover:text-purple-950 font-bold hover:underline"
             >
-              เกี่ยวกับ UPmatch
+              เกี่ยวกับ UPyes
             </Link>
             <span className="text-slate-300">•</span>
             <span>
@@ -208,7 +208,7 @@ export default function LandingPage() {
           </div>
 
           <p className="text-[10px] text-slate-400 pt-1">
-            © 2026 UPmatch Student Project. Developed by Suphakit Saeyang. All rights reserved.
+            © 2026 UPyes Student Project. Developed by Suphakit Saeyang. All rights reserved.
           </p>
         </div>
       </footer>

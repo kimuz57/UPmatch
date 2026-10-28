@@ -13,7 +13,7 @@ self.addEventListener('push', (event) => {
 
   try {
     const payload = event.data.json();
-    const title = payload.title || 'UP Match';
+    const title = payload.title || 'UPyes';
     const options = {
       body: payload.body || 'มีการแจ้งเตือนใหม่',
       icon: payload.icon || '/logo.png',
