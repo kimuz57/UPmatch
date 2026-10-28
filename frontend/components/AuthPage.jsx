@@ -73,9 +73,22 @@ export default function AuthPage({ onLoginSuccess, onBack }) {
         }),
       });
 
-      const data = await res.json();
+      let data = {};
+      const contentType = res.headers.get("content-type") || "";
+      if (contentType.includes("application/json")) {
+        data = await res.json().catch(() => ({}));
+      } else {
+        await res.text().catch(() => "");
+      }
+
       if (!res.ok) {
-        throw new Error(data.error || "ไม่สามารถส่งรหัส OTP ได้");
+        throw new Error(
+          data.error ||
+          data.message ||
+          (res.status >= 500
+            ? "ระบบหลังบ้านขัดข้องชั่วคราว (Internal Server Error) กรุณารอสักครู่หรือตรวจสอบการทำงานของเซิร์ฟเวอร์"
+            : "ไม่สามารถส่งรหัส OTP ได้")
+        );
       }
 
       setInfoMsg(
@@ -119,9 +132,22 @@ export default function AuthPage({ onLoginSuccess, onBack }) {
         }),
       });
 
-      const data = await res.json();
+      let data = {};
+      const contentType = res.headers.get("content-type") || "";
+      if (contentType.includes("application/json")) {
+        data = await res.json().catch(() => ({}));
+      } else {
+        await res.text().catch(() => "");
+      }
+
       if (!res.ok) {
-        throw new Error(data.error || "รหัส OTP ไม่ถูกต้องหรือหมดอายุแล้ว");
+        throw new Error(
+          data.error ||
+          data.message ||
+          (res.status >= 500
+            ? "ระบบหลังบ้านขัดข้องชั่วคราว กรุณาลองใหม่อีกครั้ง"
+            : "รหัส OTP ไม่ถูกต้องหรือหมดอายุแล้ว")
+        );
       }
 
       if (referralCode) {
