@@ -54,11 +54,14 @@ export default function AuthPage({ onLoginSuccess, onBack }) {
   };
 
   const handleConfirmDisclaimer = async () => {
-    setShowDisclaimer(false);
+    if (loading) return;
     await doSendOtp();
   };
 
   const doSendOtp = async () => {
+    if (loading) return;
+    setLoading(true);
+    setErrorMsg("");
 
     try {
       const res = await fetch(`${getApiBaseUrl()}/api/v1/auth/send-otp`, {
@@ -78,11 +81,13 @@ export default function AuthPage({ onLoginSuccess, onBack }) {
       setInfoMsg(
         data.message || "ส่งรหัส OTP ไปที่อีเมล @up.ac.th เรียบร้อยแล้ว",
       );
+      setShowDisclaimer(false);
       setStep("otp");
     } catch (err) {
       setErrorMsg(
         err.message || "เชื่อมต่อเซิร์ฟเวอร์ไม่สำเร็จ กรุณาตรวจสอบการเชื่อมต่อ",
       );
+      setShowDisclaimer(false);
     } finally {
       setLoading(false);
     }
@@ -347,8 +352,9 @@ export default function AuthPage({ onLoginSuccess, onBack }) {
               </div>
               <button
                 type="button"
+                disabled={loading}
                 onClick={() => setShowDisclaimer(false)}
-                className="p-1 rounded-lg hover:bg-slate-100 text-slate-400 hover:text-slate-700 cursor-pointer"
+                className="p-1 rounded-lg hover:bg-slate-100 text-slate-400 hover:text-slate-700 cursor-pointer disabled:opacity-40 disabled:cursor-not-allowed"
               >
                 <X className="w-5 h-5" />
               </button>
@@ -406,17 +412,26 @@ export default function AuthPage({ onLoginSuccess, onBack }) {
             <div className="mt-5 pt-3 border-t border-slate-100 flex flex-col-reverse sm:flex-row items-stretch sm:items-center justify-end gap-2">
               <button
                 type="button"
+                disabled={loading}
                 onClick={() => setShowDisclaimer(false)}
-                className="w-full sm:w-auto px-4 py-2.5 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold text-xs cursor-pointer transition"
+                className="w-full sm:w-auto px-4 py-2.5 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold text-xs cursor-pointer transition disabled:opacity-40 disabled:cursor-not-allowed"
               >
                 ยกเลิก
               </button>
               <button
                 type="button"
+                disabled={loading}
                 onClick={handleConfirmDisclaimer}
-                className="w-full sm:w-auto px-5 py-2.5 rounded-xl bg-purple-900 hover:bg-purple-950 text-white font-bold text-xs shadow-xs cursor-pointer transition active:scale-98"
+                className="w-full sm:w-auto px-5 py-2.5 rounded-xl bg-purple-900 hover:bg-purple-950 text-white font-bold text-xs shadow-xs cursor-pointer transition active:scale-98 disabled:opacity-60 disabled:cursor-not-allowed flex items-center justify-center gap-2"
               >
-                รับทราบและเข้าใจข้อตกลง
+                {loading ? (
+                  <>
+                    <Loader2 className="w-3.5 h-3.5 animate-spin" />
+                    <span>กำลังส่งรหัส OTP...</span>
+                  </>
+                ) : (
+                  <span>รับทราบและเข้าใจข้อตกลง</span>
+                )}
               </button>
             </div>
           </div>
