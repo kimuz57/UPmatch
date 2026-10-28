@@ -7,6 +7,7 @@ import (
 	"fmt"
 	"log"
 	"os"
+	"regexp"
 	"strconv"
 	"strings"
 	"time"
@@ -18,6 +19,13 @@ import (
 	"upmatch-backend/models"
 	"upmatch-backend/utils"
 )
+
+// บังคับรูปแบบอีเมลนิสิต ม.พะเยา รหัส 8 หลัก เช่น 67021589@up.ac.th
+var upStudentEmailRegex = regexp.MustCompile(`^[0-9]{8}@up\.ac\.th$`)
+
+func isValidUPEmail(email string) bool {
+	return upStudentEmailRegex.MatchString(strings.ToLower(strings.TrimSpace(email)))
+}
 
 type OTPRequest struct {
 	Email string `json:"email"`
@@ -77,19 +85,17 @@ func getOTPExpiry() time.Duration {
 }
 
 func checkTestAccount(email string) (bool, string) {
-	enableTest := os.Getenv("ENABLE_TEST_ACCOUNTS")
-	if enableTest == "false" || enableTest == "0" {
+	enableTest := strings.ToLower(os.Getenv("ENABLE_TEST_ACCOUNTS"))
+	if enableTest != "true" {
 		return false, ""
 	}
 	prefix := os.Getenv("TEST_ACCOUNT_PREFIX")
-	if prefix == "" {
-		prefix = "123"
-	}
 	otp := os.Getenv("TEST_ACCOUNT_OTP")
-	if otp == "" {
-		otp = "123456"
+	if prefix == "" || otp == "" {
+		return false, ""
 	}
-	if strings.HasPrefix(email, prefix) {
+	cleanEmail := strings.ToLower(strings.TrimSpace(email))
+	if strings.HasPrefix(cleanEmail, strings.ToLower(prefix)) {
 		return true, otp
 	}
 	return false, ""
@@ -101,34 +107,55 @@ func SendOTP(c *fiber.Ctx) error {
 		return c.Status(400).JSON(fiber.Map{"error": "รูปแบบข้อมูลไม่ถูกต้อง"})
 	}
 
-	// 1. สุ่มรหัส OTP 6 หลัก
+	cleanEmail := strings.ToLower(strings.TrimSpace(req.Email))
+	if cleanEmail == "" {
+		return c.Status(400).JSON(fiber.Map{"error": "กรุณากรอกอีเมลนิสิต"})
+	}
+
+	// 1. ตรวจสอบเงื่อนไขอีเมลต้องเป็นนิสิต ม.พะเยา เท่านั้น (@up.ac.th 8 หลัก)
+	isTest, testOTP := checkTestAccount(cleanEmail)
+	if !isTest && !isValidUPEmail(cleanEmail) {
+		return c.Status(400).JSON(fiber.Map{
+			"error": "ต้องใช้อีเมลนิสิต @up.ac.th ของมหาวิทยาลัยพะเยาเท่านั้น (เช่น 67021589@up.ac.th)",
+		})
+	}
+
+	// 2. ป้องกัน Brute-force / Spam: Cooldown 60 วินาทีต่อ 1 บัญชี
+	cooldownKey := fmt.Sprintf("upmatch:otp:cooldown:%s", cleanEmail)
+	if exists, _ := config.RedisClient.Exists(config.Ctx, cooldownKey).Result(); exists > 0 {
+		return c.Status(429).JSON(fiber.Map{
+			"error": "คุณเพิ่งขอรหัส OTP ไป กรุณารอ 60 วินาทีก่อนขอใหม่อีกครั้ง",
+		})
+	}
+
+	// 3. สุ่มรหัส OTP 6 หลัก
 	otp := utils.GenerateOTP()
 	otpExpiry := getOTPExpiry()
 
-	// 2. บันทึก OTP ลง Redis พร้อมตั้งเวลาหมดอายุจาก env
-	redisKey := fmt.Sprintf("upmatch:otp:%s", req.Email)
+	// 4. บันทึก OTP ลง Redis
+	redisKey := fmt.Sprintf("upmatch:otp:%s", cleanEmail)
 	err := config.RedisClient.Set(config.Ctx, redisKey, otp, otpExpiry).Err()
 	if err != nil {
 		log.Println("❌ บันทึก Redis ล้มเหลว:", err)
 		return c.Status(500).JSON(fiber.Map{"error": "ระบบขัดข้อง ไม่สามารถสร้างรหัส OTP ได้"})
 	}
-	log.Printf("✅ บันทึก OTP ลง Redis สำเร็จ: %s สำหรับอีเมล: %s (หมดอายุใน %v)", otp, req.Email, otpExpiry)
+	_ = config.RedisClient.Set(config.Ctx, cooldownKey, "1", 60*time.Second).Err()
+	log.Printf("✅ บันทึก OTP ลง Redis สำเร็จสำหรับอีเมล: %s (หมดอายุใน %v)", cleanEmail, otpExpiry)
 
-	// สำหรับบัญชีทดสอบที่เปิดใช้งานผ่าน .env
-	if isTest, testOTP := checkTestAccount(req.Email); isTest {
+	// สำหรับบัญชีทดสอบ (เฉพาะเมื่อเปิดใช้งานใน dev จริงๆ เท่านั้น)
+	if isTest {
 		_ = config.RedisClient.Set(config.Ctx, redisKey, testOTP, 24*time.Hour).Err()
-		log.Printf("🧪 บัญชีทดสอบ %s: ใช้ OTP %s", req.Email, testOTP)
+		log.Printf("🧪 บัญชีทดสอบ %s เปิดใช้งาน", cleanEmail)
 		return c.Status(200).JSON(fiber.Map{
-			"message": fmt.Sprintf("รหัส OTP ทดสอบคือ %s", testOTP),
+			"message": "ส่งรหัส OTP เรียบร้อยแล้ว (โหมดทดสอบ)",
 		})
 	}
 
-	// 3. ส่งอีเมลจริง
-	err = utils.SendEmailOTPWithGmailAPI(req.Email, otp)
+	// 5. ส่งอีเมลจริงผ่าน Gmail API
+	err = utils.SendEmailOTPWithGmailAPI(cleanEmail, otp)
 	if err != nil {
-		// ทริค: ถ้าส่งเมล์ไม่สำเร็จ ให้ลบ OTP ใน Redis ทิ้งทันที ป้องกันขยะตกค้าง
 		config.RedisClient.Del(config.Ctx, redisKey) 
-		
+		config.RedisClient.Del(config.Ctx, cooldownKey)
 		log.Println("❌ ส่งอีเมลล้มเหลว:", err)
 		return c.Status(500).JSON(fiber.Map{
 			"error": fmt.Sprintf("ไม่สามารถส่งอีเมลได้: %v", err),
@@ -136,7 +163,7 @@ func SendOTP(c *fiber.Ctx) error {
 	}
 
 	return c.Status(200).JSON(fiber.Map{
-		"message": "ส่งรหัส OTP ไปที่อีเมล " + req.Email + " เรียบร้อยแล้ว",
+		"message": "ส่งรหัส OTP ไปที่อีเมล " + cleanEmail + " เรียบร้อยแล้ว",
 	})
 }
 
@@ -146,15 +173,27 @@ func VerifyOTP(c *fiber.Ctx) error {
 		return c.Status(400).JSON(fiber.Map{"error": "รูปแบบข้อมูลไม่ถูกต้อง"})
 	}
 
+	cleanEmail := strings.ToLower(strings.TrimSpace(req.Email))
+	if cleanEmail == "" {
+		return c.Status(400).JSON(fiber.Map{"error": "กรุณากรอกอีเมลนิสิต"})
+	}
+
+	// ตรวจสอบเงื่อนไขอีเมลต้องเป็นนิสิต ม.พะเยา เท่านั้น
+	isTest, testOTP := checkTestAccount(cleanEmail)
+	if !isTest && !isValidUPEmail(cleanEmail) {
+		return c.Status(400).JSON(fiber.Map{
+			"error": "ต้องใช้อีเมลนิสิต @up.ac.th ของมหาวิทยาลัยพะเยาเท่านั้น (เช่น 67021589@up.ac.th)",
+		})
+	}
+
 	// 1. ดึง OTP จาก Redis ตามอีเมลที่ขอมา
-	redisKey := fmt.Sprintf("upmatch:otp:%s", req.Email)
+	redisKey := fmt.Sprintf("upmatch:otp:%s", cleanEmail)
 	savedOTP, err := config.RedisClient.Get(config.Ctx, redisKey).Result()
 	
-	if isTest, testOTP := checkTestAccount(req.Email); isTest && req.OTP == testOTP {
+	if isTest && req.OTP == testOTP {
 		savedOTP = testOTP
 		err = nil
 	} else if err == redis.Nil {
-		// หา key ไม่เจอ = รหัสหมดอายุไปแล้ว หรืออีเมลนี้ยังไม่ได้กดขอ OTP
 		return c.Status(400).JSON(fiber.Map{"error": "รหัส OTP หมดอายุหรือไม่ถูกต้อง"})
 	} else if err != nil {
 		log.Println("❌ ดึงข้อมูล Redis ล้มเหลว:", err)
@@ -170,7 +209,6 @@ func VerifyOTP(c *fiber.Ctx) error {
 	config.RedisClient.Del(config.Ctx, redisKey)
 
 	// 4. สร้าง Secure Random Session Token ที่ไม่ซ้ำกันสำหรับผู้ใช้แต่ละคน
-	cleanEmail := strings.TrimSpace(strings.ToLower(req.Email))
 	b := make([]byte, 24)
 	if _, err := rand.Read(b); err != nil {
 		log.Println("❌ สุ่ม Token ล้มเหลว:", err)

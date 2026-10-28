@@ -529,7 +529,7 @@ export default function ProfilePage() {
                   {profile.faculty}
                 </span>
               )}
-              {profile.height && profile.height > 0 ? (
+              {Number(profile.height) > 0 ? (
                 <span className="flex items-center gap-1 text-[11px] font-semibold bg-purple-50 text-purple-900 border border-purple-200 px-2.5 py-1 rounded-full">
                   <Ruler className="w-3 h-3 text-purple-700" />
                   {profile.height} ซม.

@@ -125,7 +125,7 @@ export default function ProfileDetailModal({
             <div className="absolute bottom-4 left-4 right-4 z-20 text-white pointer-events-none">
               <div className="flex items-center gap-2">
                 <h1 className="text-xl sm:text-2xl font-black drop-shadow-xs">
-                  {user.name}
+                  {user.name || "นิสิต ม.พะเยา"}
                   {user.age ? `, ${user.age}` : ""}
                 </h1>
                 <span className="bg-purple-800 text-white text-[10px] font-bold px-2 py-0.5 rounded-full shadow-xs">
@@ -215,7 +215,7 @@ export default function ProfileDetailModal({
                   <Ruler className="w-4 h-4 text-purple-800" />
                   <span>ส่วนสูง</span>
                 </div>
-                {user.height && user.height > 0 ? (
+                {Number(user.height) > 0 ? (
                   <p className="text-xs sm:text-sm font-semibold text-slate-900">{user.height} ซม.</p>
                 ) : (
                   <p className="text-xs text-slate-500 font-normal">ไม่ได้ระบุ</p>

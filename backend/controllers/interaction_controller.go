@@ -23,9 +23,6 @@ func HandleSwipe(c *fiber.Ctx) error {
 		return c.Status(400).JSON(fiber.Map{"error": "Invalid request"})
 	}
 
-	if myEmail == "" && req.MyEmail != "" {
-		myEmail = strings.TrimSpace(req.MyEmail)
-	}
 
 	myEmail = strings.ToLower(strings.TrimSpace(myEmail))
 	targetEmail := strings.ToLower(strings.TrimSpace(req.TargetEmail))

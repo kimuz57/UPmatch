@@ -195,8 +195,9 @@ export default function GlobalNotification() {
 
     const connectSSE = () => {
       try {
+        const token = getCookie("up_match_token");
         const baseUrl = getApiBaseUrl();
-        const sseUrl = `${baseUrl}/api/v1/chat/sse?email=${encodeURIComponent(email)}`;
+        const sseUrl = `${baseUrl}/api/v1/chat/sse?token=${encodeURIComponent(token || "")}`;
         eventSource = new EventSource(sseUrl, { withCredentials: true });
 
         // เมื่อมีข้อความใหม่เข้ามา

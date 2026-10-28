@@ -164,13 +164,13 @@ function SwipeableCard({
       >
         <div className="flex items-center gap-2">
           <h2 className="text-xl sm:text-2xl font-black drop-shadow-sm">
-            {card.name}{currentAge ? `, ${currentAge}` : ""}
+            {card.name || "นิสิต ม.พะเยา"}{currentAge ? `, ${currentAge}` : ""}
           </h2>
-          {card.height && card.height > 0 && (
+          {Number(card.height) > 0 ? (
             <span className="text-[10px] bg-white/20 backdrop-blur-xs text-white font-bold px-2 py-0.5 rounded-full">
               {card.height} ซม.
             </span>
-          )}
+          ) : null}
           <span className="text-[10px] bg-white text-purple-950 font-bold px-2 py-0.5 rounded-full shadow-xs">
             ดูโปรไฟล์
           </span>
@@ -529,7 +529,7 @@ export default function SwipePage() {
                   />
                   <div className="absolute inset-0 bg-gradient-to-t from-slate-950/90 via-slate-950/25 to-transparent pointer-events-none" />
                   <div className="absolute bottom-6 left-5 right-5 text-white pointer-events-none">
-                    <h3 className="text-xl font-black drop-shadow-sm">{nextCard.name}</h3>
+                    <h3 className="text-xl font-black drop-shadow-sm">{nextCard.name || "นิสิต ม.พะเยา"}</h3>
                     {nextCard.faculty && <p className="text-xs text-purple-200 font-semibold">{nextCard.faculty}</p>}
                   </div>
                 </div>
@@ -654,7 +654,7 @@ export default function SwipePage() {
                 )}
 
                 {/* Height */}
-                {currentCard.height && currentCard.height > 0 && (
+                {Number(currentCard.height) > 0 ? (
                   <div className="p-3 rounded-xl bg-slate-50 border border-slate-200 flex items-center justify-between">
                     <div className="flex items-center gap-2">
                       <span className="p-1.5 rounded-lg bg-purple-100 text-purple-900">
@@ -666,7 +666,7 @@ export default function SwipePage() {
                       {currentCard.height} ซม.
                     </span>
                   </div>
-                )}
+                ) : null}
 
                 {/* MBTI */}
                 {currentCard.mbti && currentCard.mbti.trim() !== "-" && currentCard.mbti.trim() !== "" && (

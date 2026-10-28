@@ -568,10 +568,6 @@ func SendMessage(c *fiber.Ctx) error {
 			return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{"error": "รูปแบบข้อมูลไม่ถูกต้อง: " + err.Error()})
 		}
 	}
-
-	if myEmail == "" && req.MyEmail != "" {
-		myEmail = ResolveEmail(strings.TrimSpace(req.MyEmail))
-	}
 	targetEmail := ResolveEmail(strings.TrimSpace(req.TargetEmail))
 	content := strings.TrimSpace(req.Content)
 
@@ -646,14 +642,7 @@ func SendMessage(c *fiber.Ctx) error {
 
 // 4. SSE (Server-Sent Events) Endpoint สำหรับ Realtime Chat & Inbox
 func ChatSSE(c *fiber.Ctx) error {
-	requestedEmail := strings.TrimSpace(c.Query("email"))
-	if requestedEmail == "" {
-		requestedEmail = strings.TrimSpace(c.Query("my_email"))
-	}
-	if requestedEmail == "" {
-		requestedEmail = GetCurrentUserEmail(c)
-	}
-	myEmail := strings.ToLower(strings.TrimSpace(ResolveEmail(requestedEmail)))
+	myEmail := strings.ToLower(strings.TrimSpace(ResolveEmail(GetCurrentUserEmail(c))))
 	if myEmail == "" {
 		return c.Status(fiber.StatusUnauthorized).SendString("Unauthorized: กรุณาเข้าสู่ระบบ")
 	}
@@ -760,9 +749,6 @@ func Unmatch(c *fiber.Ctx) error {
 	myEmail := ResolveEmail(GetCurrentUserEmail(c))
 	var req UnmatchRequest
 	_ = c.BodyParser(&req)
-	if myEmail == "" && req.MyEmail != "" {
-		myEmail = ResolveEmail(req.MyEmail)
-	}
 	targetEmail := ResolveEmail(req.TargetEmail)
 
 	if myEmail == "" || targetEmail == "" {
@@ -820,9 +806,6 @@ func ReportUser(c *fiber.Ctx) error {
 	myEmail := ResolveEmail(GetCurrentUserEmail(c))
 	var req ReportRequest
 	_ = c.BodyParser(&req)
-	if myEmail == "" && req.MyEmail != "" {
-		myEmail = ResolveEmail(req.MyEmail)
-	}
 	targetEmail := ResolveEmail(req.TargetEmail)
 
 	if myEmail == "" || targetEmail == "" || req.Reason == "" {

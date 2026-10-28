@@ -218,31 +218,38 @@ func calculateAge(birthDate time.Time) int {
 	return age
 }
 
-// GetCurrentUserEmail ดึง email ผู้ใช้จาก Cookie, Query, Header, หรือ Authorization
+// GetCurrentUserEmail ตรวจสอบและดึง email ผู้ใช้จริงจาก Session Token ใน Redis
+// ป้องกันการปลอมแปลงอีเมลผ่าน Header, Query หรือ Cookie โดยเด็ดขาด
 func GetCurrentUserEmail(c *fiber.Ctx) string {
-	// 1. จาก Cookie
-	if email := c.Cookies("upmatch_email"); strings.TrimSpace(email) != "" {
-		return strings.TrimSpace(email)
-	}
-	// 2. จาก Query string (?email=... หรือ ?my_email=...)
-	if email := c.Query("email"); strings.TrimSpace(email) != "" {
-		return strings.TrimSpace(email)
-	}
-	if email := c.Query("my_email"); strings.TrimSpace(email) != "" {
-		return strings.TrimSpace(email)
-	}
-	// 3. จาก Header X-User-Email
-	if email := c.Get("X-User-Email"); strings.TrimSpace(email) != "" {
-		return strings.TrimSpace(email)
-	}
-	// 4. จาก Authorization Header ถ้ามี email
+	token := ""
+
+	// 1. ดึง Token จาก Authorization Header: Bearer <token>
 	auth := c.Get("Authorization")
 	if strings.HasPrefix(auth, "Bearer ") {
-		token := strings.TrimSpace(strings.TrimPrefix(auth, "Bearer "))
-		if strings.Contains(token, "@") {
-			return token
+		token = strings.TrimSpace(strings.TrimPrefix(auth, "Bearer "))
+	}
+
+	// 2. ดึง Token จาก Cookie up_match_token หรือ token
+	if token == "" {
+		token = strings.TrimSpace(c.Cookies("up_match_token"))
+	}
+	if token == "" {
+		token = strings.TrimSpace(c.Cookies("token"))
+	}
+
+	// 3. ดึง Token จาก Query token (สำหรับ SSE / EventSource)
+	if token == "" {
+		token = strings.TrimSpace(c.Query("token"))
+	}
+
+	// 4. ตรวจสอบความถูกต้องของ Token กับ Redis Session Store
+	if token != "" && config.RedisClient != nil {
+		redisSessionKey := fmt.Sprintf("upmatch:session:%s", token)
+		if email, err := config.RedisClient.Get(config.Ctx, redisSessionKey).Result(); err == nil && email != "" {
+			return strings.ToLower(strings.TrimSpace(email))
 		}
 	}
+
 	return ""
 }
 
@@ -401,6 +408,9 @@ func GetFeed(c *fiber.Ctx) error {
 	// 8. จัดเตรียมข้อมูลส่งให้ Frontend (คัดกรองตามเพศที่สนใจ / Preference แบบสองทิศทาง Mutual Match)
 	profiles := []fiber.Map{}
 	for _, u := range users {
+		if strings.TrimSpace(u.Name) == "" {
+			continue
+		}
 		prof := getProfileByEmail(u.Email)
 		targetGender := normalizeGender(prof.Gender)
 		targetPref := normalizePreference(prof.Preference)

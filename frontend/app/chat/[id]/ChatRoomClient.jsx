@@ -212,8 +212,8 @@ export default function ChatRoomClient({ targetEmail }) {
 
     fetchMessages(true);
 
-    const cleanTarget = decodeURIComponent(targetEmail);
-    const sseUrl = `${getApiBaseUrl()}/api/v1/chat/sse?email=${encodeURIComponent(email || "")}&target_email=${encodeURIComponent(cleanTarget)}`;
+    const token = getCookie("up_match_token");
+    const sseUrl = `${getApiBaseUrl()}/api/v1/chat/sse?token=${encodeURIComponent(token || "")}&target_email=${encodeURIComponent(cleanTarget)}`;
 
     let eventSource;
     try {

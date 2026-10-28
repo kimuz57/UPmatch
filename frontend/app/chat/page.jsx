@@ -129,8 +129,9 @@ export default function ChatPage() {
     let eventSource;
     if (email) {
       try {
+        const token = getCookie("up_match_token");
         const baseUrl = getApiBaseUrl();
-        const sseUrl = `${baseUrl}/api/v1/chat/sse?email=${encodeURIComponent(email)}`;
+        const sseUrl = `${baseUrl}/api/v1/chat/sse?token=${encodeURIComponent(token || "")}`;
         eventSource = new EventSource(sseUrl, { withCredentials: true });
 
         const handleIncoming = () => {

@@ -40,10 +40,28 @@ func getMaxProfilePhotos() int {
 
 // บันทึกข้อมูลโปรไฟล์และอัปโหลดรูปภาพ (Multi-step complete)
 func SaveProfile(c *fiber.Ctx) error {
-	email := c.FormValue("email")
-	name := c.FormValue("name")
-	gender := c.FormValue("gender")
-	preference := c.FormValue("preference")
+	// ต้องผ่านการตรวจสอบ Session Token เท่านั้น ป้องกันการแอบอ้างสิทธิ์ของผู้อื่น
+	email := GetCurrentUserEmail(c)
+	if email == "" {
+		return c.Status(fiber.StatusUnauthorized).JSON(fiber.Map{"error": "Unauthorized: กรุณาเข้าสู่ระบบก่อนบันทึกโปรไฟล์"})
+	}
+
+	name := strings.TrimSpace(c.FormValue("name"))
+	if name == "" {
+		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{"error": "กรุณากรอกชื่อเล่นของคุณ (ช่องชื่อเป็นข้อมูลจำเป็น)"})
+	}
+	if len(name) < 2 || len(name) > 50 {
+		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{"error": "ชื่อต้องมีความยาวระหว่าง 2 ถึง 50 ตัวอักษร"})
+	}
+
+	gender := strings.TrimSpace(c.FormValue("gender"))
+	if gender == "" {
+		gender = "ชาย"
+	}
+	preference := strings.TrimSpace(c.FormValue("preference"))
+	if preference == "" {
+		preference = "ทุกคน"
+	}
 	birthDateStr := c.FormValue("birth_date") // รูปแบบ "YYYY-MM-DD"
 	caption := c.FormValue("caption")
 	hobbies := c.FormValue("hobbies")
