@@ -169,6 +169,10 @@ export default function ProfilePage() {
       if (res.ok) {
         const data = await res.json();
         const p = data.profile;
+        if (!p) {
+          router.replace("/onboarding");
+          return;
+        }
         setProfile(p);
         syncSlotsWithProfile(p);
 
@@ -229,8 +233,17 @@ export default function ProfilePage() {
       data.append("mbti", editForm.mbti);
       data.append("height", String(editForm.height || 0));
 
+      const token = getCookie("up_match_token");
+      if (token) {
+        data.append("token", token);
+      }
+
       const res = await fetch(`${getApiBaseUrl()}/api/v1/profile`, {
         method: "POST",
+        credentials: "include",
+        headers: {
+          ...(token ? { Authorization: `Bearer ${token}` } : {}),
+        },
         body: data,
       });
 
@@ -442,8 +455,17 @@ export default function ProfilePage() {
 
       data.append("photos_manifest", JSON.stringify(manifest));
 
+      const token = getCookie("up_match_token");
+      if (token) {
+        data.append("token", token);
+      }
+
       const res = await fetch(`${getApiBaseUrl()}/api/v1/profile`, {
         method: "POST",
+        credentials: "include",
+        headers: {
+          ...(token ? { Authorization: `Bearer ${token}` } : {}),
+        },
         body: data,
       });
 

@@ -266,7 +266,9 @@ export default function SwipePage() {
             if (Array.isArray(parsed) && parsed.length > 0) {
               const swipedKey = `upmatch_swiped_${email || "guest"}`;
               const savedSwiped = JSON.parse(sessionStorage.getItem(swipedKey) || "[]");
-              const remaining = parsed.filter((p) => !savedSwiped.includes(p.id));
+              const remaining = parsed
+                .filter((p) => !savedSwiped.includes(p.id))
+                .filter((p) => p.name && p.name.trim() !== "" && p.image && !p.image.includes("unsplash.com") && p.image !== "/placeholder.jpg" && p.image !== "/logo.png");
               if (remaining.length > 0) {
                 setProfiles(remaining);
                 setLoading(false);

@@ -9,26 +9,26 @@ export function getApiBaseUrl() {
   const envUrl = process.env.NEXT_PUBLIC_API_URL;
 
   if (typeof window !== "undefined") {
-    // 1. ถ้ามี NEXT_PUBLIC_API_URL ชัดเจนและไม่ใช่ localhost ให้ใช้ค่านั้นได้ทันที
-    if (envUrl && !envUrl.includes("localhost") && !envUrl.includes("127.0.0.1")) {
-      return envUrl;
-    }
-
     const host = window.location.hostname;
     const isLocal = host === "localhost" || host === "127.0.0.1";
     const isPrivateIp = /^(192\.168\.|10\.|172\.(1[6-9]|2[0-9]|3[0-1])\.)/.test(host);
 
-    // 2. ถ้าเข้าใช้งานผ่านโดเมนสาธารณะ เช่น Cloudflare Tunnel (upmatch.tcmg.me)
-    if (!isLocal && !isPrivateIp) {
+    // 1. กรณี Localhost ในการพัฒนา ให้ใช้ Relative Path ผ่าน Next.js Rewrites เสมอ
+    if (isLocal) {
+      return "";
+    }
+
+    // 2. ถ้ามี NEXT_PUBLIC_API_URL ชัดเจนและไม่ใช่ localhost ให้ใช้ค่านั้นได้ทันที
+    if (envUrl && !envUrl.includes("localhost") && !envUrl.includes("127.0.0.1")) {
+      return envUrl;
+    }
+
+    // 3. ถ้าเข้าใช้งานผ่านโดเมนสาธารณะ หรือวง LAN (เช่น iPad 192.168.x.x)
+    if (!isLocal || isPrivateIp) {
       return window.location.origin;
     }
 
-    // 3. ถ้าเข้าใช้งานผ่านวง LAN (เช่น iPad 192.168.x.x)
-    if (isPrivateIp) {
-      return window.location.origin;
-    }
-
-    // 4. กรณี Localhost
+    // 4. Fallback กรณีอื่นๆ
     return envUrl || "http://localhost:8081";
   }
 

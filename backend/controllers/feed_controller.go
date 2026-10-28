@@ -242,7 +242,12 @@ func GetCurrentUserEmail(c *fiber.Ctx) string {
 		token = strings.TrimSpace(c.Query("token"))
 	}
 
-	// 4. ตรวจสอบความถูกต้องของ Token กับ Redis Session Store
+	// 4. ดึง Token จาก FormValue token (สำหรับ Multipart FormData)
+	if token == "" {
+		token = strings.TrimSpace(c.FormValue("token"))
+	}
+
+	// 5. ตรวจสอบความถูกต้องของ Token กับ Redis Session Store
 	if token != "" && config.RedisClient != nil {
 		redisSessionKey := fmt.Sprintf("upmatch:session:%s", token)
 		if email, err := config.RedisClient.Get(config.Ctx, redisSessionKey).Result(); err == nil && email != "" {
@@ -261,8 +266,11 @@ func GetMe(c *fiber.Ctx) error {
 	}
 
 	var user models.User
-	if err := config.DB.Preload("Images").Where("email = ?", email).First(&user).Error; err != nil {
-		return c.Status(fiber.StatusNotFound).JSON(fiber.Map{"error": "ไม่พบข้อมูลโปรไฟล์ในฐานข้อมูล"})
+	if err := config.DB.Preload("Images").Where("LOWER(email) = ?", email).First(&user).Error; err != nil {
+		return c.Status(fiber.StatusOK).JSON(fiber.Map{
+			"profile": nil,
+			"is_new":  true,
+		})
 	}
 
 	prof := getProfileByEmail(user.Email)
@@ -396,7 +404,7 @@ func GetFeed(c *fiber.Ctx) error {
 
 	// 7. ค้นหา User ทั้งหมดที่ไม่อยู่ใน excludedEmails พร้อมสุ่มด้วย RANDOM()
 	var users []models.User
-	query := config.DB.Preload("Images").Order("RANDOM()")
+	query := config.DB.Preload("Images").Where("TRIM(name) != '' AND name IS NOT NULL").Order("RANDOM()")
 	if len(excludedEmails) > 0 {
 		query = query.Where("LOWER(email) NOT IN ?", excludedEmails)
 	}
@@ -411,27 +419,8 @@ func GetFeed(c *fiber.Ctx) error {
 		if strings.TrimSpace(u.Name) == "" {
 			continue
 		}
-		prof := getProfileByEmail(u.Email)
-		targetGender := normalizeGender(prof.Gender)
-		targetPref := normalizePreference(prof.Preference)
 
-		// 1) กรองตามความสนใจของเรา: ถ้าเราอยากเจอแค่ "หญิง" หรือ "ชาย" เพศของเป้าหมายต้องตรงกับที่เราต้องการ
-		if myPref != "ทุกคน" && myPref != "" {
-			if targetGender != "" && targetGender != myPref {
-				continue // เพศของเป้าหมายไม่ตรงกับความสนใจของเรา -> ข้าม
-			}
-		}
-
-		// 2) กรองตามความสนใจของเป้าหมาย (Mutual Match): เพศของเราต้องตรงกับที่เป้าหมายต้องการ (หรือเป้าหมายสนใจ "ทุกคน")
-		if targetPref != "ทุกคน" && targetPref != "" {
-			if myGender != "" && myGender != targetPref {
-				continue // เพศของเราไม่ตรงกับความสนใจของเป้าหมาย -> ข้าม
-			}
-		}
-
-		age := calculateAge(prof.BirthDate)
-		imageURL := firstImageURL(u.Images)
-
+		// 1) คัดกรองรูปภาพ: ต้องมีรูปภาพจริงที่ผู้ใช้อัปโหลดอย่างน้อย 1 รูป ห้ามนำ Default Avatar/Stock Image มาขึ้นหน้า Swipe
 		var allImages []string
 		sortedImages := make([]models.UserImage, len(u.Images))
 		copy(sortedImages, u.Images)
@@ -439,13 +428,35 @@ func GetFeed(c *fiber.Ctx) error {
 			return sortedImages[i].DisplayOrder < sortedImages[j].DisplayOrder
 		})
 		for _, img := range sortedImages {
-			if img.ImageURL != "" {
-				allImages = append(allImages, formatImageURL(img.ImageURL))
+			cleanImg := strings.TrimSpace(img.ImageURL)
+			if cleanImg != "" && !strings.Contains(cleanImg, "unsplash.com") && cleanImg != "/placeholder.jpg" && cleanImg != "/logo.png" {
+				allImages = append(allImages, formatImageURL(cleanImg))
 			}
 		}
-		if len(allImages) == 0 && imageURL != "" {
-			allImages = append(allImages, imageURL)
+		if len(allImages) == 0 {
+			continue // ไม่มีรูปจริง ข้ามไปเลย
 		}
+		imageURL := allImages[0]
+
+		prof := getProfileByEmail(u.Email)
+		targetGender := normalizeGender(prof.Gender)
+		targetPref := normalizePreference(prof.Preference)
+
+		// 2) กรองตามความสนใจของเรา: ถ้าเราอยากเจอแค่ "หญิง" หรือ "ชาย" เพศของเป้าหมายต้องตรงกับที่เราต้องการ
+		if myPref != "ทุกคน" && myPref != "" {
+			if targetGender != "" && targetGender != myPref {
+				continue // เพศของเป้าหมายไม่ตรงกับความสนใจของเรา -> ข้าม
+			}
+		}
+
+		// 3) กรองตามความสนใจของเป้าหมาย (Mutual Match): เพศของเราต้องตรงกับที่เป้าหมายต้องการ (หรือเป้าหมายสนใจ "ทุกคน")
+		if targetPref != "ทุกคน" && targetPref != "" {
+			if myGender != "" && myGender != targetPref {
+				continue // เพศของเราไม่ตรงกับความสนใจของเป้าหมาย -> ข้าม
+			}
+		}
+
+		age := calculateAge(prof.BirthDate)
 
 		birthDateStr := ""
 		if !prof.BirthDate.IsZero() {

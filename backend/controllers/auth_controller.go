@@ -113,12 +113,12 @@ func SendOTP(c *fiber.Ctx) error {
 	}
 
 	// 1. ตรวจสอบเงื่อนไขอีเมลต้องเป็นนิสิต ม.พะเยา เท่านั้น (@up.ac.th 8 หลัก)
-	isTest, testOTP := checkTestAccount(cleanEmail)
-	if !isTest && !isValidUPEmail(cleanEmail) {
+	if !isValidUPEmail(cleanEmail) {
 		return c.Status(400).JSON(fiber.Map{
 			"error": "ต้องใช้อีเมลนิสิต @up.ac.th ของมหาวิทยาลัยพะเยาเท่านั้น (เช่น 67021589@up.ac.th)",
 		})
 	}
+	isTest, testOTP := checkTestAccount(cleanEmail)
 
 	// 2. ป้องกัน Brute-force / Spam: Cooldown 60 วินาทีต่อ 1 บัญชี
 	cooldownKey := fmt.Sprintf("upmatch:otp:cooldown:%s", cleanEmail)
@@ -179,12 +179,12 @@ func VerifyOTP(c *fiber.Ctx) error {
 	}
 
 	// ตรวจสอบเงื่อนไขอีเมลต้องเป็นนิสิต ม.พะเยา เท่านั้น
-	isTest, testOTP := checkTestAccount(cleanEmail)
-	if !isTest && !isValidUPEmail(cleanEmail) {
+	if !isValidUPEmail(cleanEmail) {
 		return c.Status(400).JSON(fiber.Map{
 			"error": "ต้องใช้อีเมลนิสิต @up.ac.th ของมหาวิทยาลัยพะเยาเท่านั้น (เช่น 67021589@up.ac.th)",
 		})
 	}
+	isTest, testOTP := checkTestAccount(cleanEmail)
 
 	// 1. ดึง OTP จาก Redis ตามอีเมลที่ขอมา
 	redisKey := fmt.Sprintf("upmatch:otp:%s", cleanEmail)
@@ -236,51 +236,22 @@ func VerifyOTP(c *fiber.Ctx) error {
 		SameSite: "Lax",
 	})
 
-	// 5. บันทึกหรือสร้าง User และประมวลผล Referral
+	// 5. ตรวจสอบสถานะบัญชีใน Database (จะไม่สร้างหรือบันทึกลง Database จนกว่าจะตั้งค่าโปรไฟล์และอัปโหลดรูปเสร็จสมบูรณ์)
 	var user models.User
-	if err := config.DB.Where("LOWER(email) = ?", cleanEmail).First(&user).Error; err != nil {
-		user = models.User{
-			Email:        cleanEmail,
-			Name:         "", // ให้เป็นค่าว่าง เพื่อบังคับให้เข้าหน้า Onboarding ตั้งชื่อเล่นและอัปโหลดรูป
-			AccountType:  "standard",
-			IsPro:        false,
-			ReferralCode: generateReferralCode(cleanEmail),
-		}
-		config.DB.Create(&user)
-	} else if user.ReferralCode == "" {
-		user.ReferralCode = generateReferralCode(cleanEmail)
-		config.DB.Save(&user)
-	}
+	userExists := config.DB.Where("LOWER(email) = ?", cleanEmail).First(&user).Error == nil
 
-	// ตรวจสอบ Referral Code เมื่อเพื่อนกดสมัครผ่านลิงก์
+	// เก็บ Referral Code ไว้ใน Redis ชั่วคราว (จะนำไปใช้เมื่อผู้ใช้ตั้งค่าโปรไฟล์เสร็จใน SaveProfile)
 	cleanRef := strings.TrimSpace(req.ReferralCode)
-	if cleanRef != "" && user.ReferredBy == "" {
-		var referrer models.User
-		if err := config.DB.Where("LOWER(referral_code) = ?", strings.ToLower(cleanRef)).First(&referrer).Error; err == nil {
-			referrerEmail := strings.ToLower(strings.TrimSpace(referrer.Email))
-			// ป้องกันการชวนตัวเอง (Self-referral check)
-			if referrerEmail != cleanEmail {
-				user.ReferredBy = referrerEmail
-				config.DB.Save(&user)
-
-				// อัปเกรดผู้ชวนเป็น PRO ทันที!
-				if !referrer.IsPro {
-					referrer.IsPro = true
-					referrer.AccountType = "pro"
-					config.DB.Save(&referrer)
-					log.Printf("🎉 User %s upgraded to PRO via referral from %s\n", referrerEmail, cleanEmail)
-
-					// ส่งสัญญาณ Real-time SSE ไปยังเครื่องของผู้ชวนทันที!
-					Hub.BroadcastProUpgrade(referrerEmail)
-				}
-			}
-		}
+	if cleanRef != "" && (!userExists || user.ReferredBy == "") {
+		refKey := fmt.Sprintf("upmatch:referral:%s", cleanEmail)
+		_ = config.RedisClient.Set(config.Ctx, refKey, cleanRef, sessionDuration).Err()
 	}
 
 	return c.Status(200).JSON(fiber.Map{
 		"message":       "ยืนยันตัวตนสำเร็จ!",
 		"email":         cleanEmail,
 		"token":         sessionToken,
+		"is_new_user":   !userExists,
 		"is_pro":        user.IsPro,
 		"account_type":  user.AccountType,
 		"referral_code": user.ReferralCode,

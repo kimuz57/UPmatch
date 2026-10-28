@@ -58,6 +58,11 @@ func ConnectDatabase() {
 	}
 	
 	log.Println("✅ Database Migrated successfully!")
-	
+
+	// ทำความสะอาดบัญชีขยะตกค้างจากระบบเดิม (บัญชีที่ยังไม่มีชื่อ หรือทำ onboarding ไม่เสร็จ)
+	database.Exec("DELETE FROM user_infos WHERE user_email IN (SELECT email FROM users WHERE name IS NULL OR TRIM(name) = '')")
+	database.Exec("DELETE FROM user_images WHERE user_email IN (SELECT email FROM users WHERE name IS NULL OR TRIM(name) = '')")
+	database.Exec("DELETE FROM users WHERE name IS NULL OR TRIM(name) = ''")
+
 	DB = database
 }

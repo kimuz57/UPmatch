@@ -258,9 +258,13 @@ export default function OnboardingPage() {
       const fullBirthDate = `${birthYear}-${formattedMonth}-${formattedDay}`;
 
       const email = getCookie("upmatch_email");
+      const token = getCookie("up_match_token");
 
       const data = new FormData();
       data.append("email", email);
+      if (token) {
+        data.append("token", token);
+      }
       data.append("name", formData.name);
       data.append("faculty", formData.faculty);
       data.append("height", formData.height ? String(formData.height) : "0");
@@ -277,6 +281,10 @@ export default function OnboardingPage() {
 
       const res = await fetch(`${getApiBaseUrl()}/api/v1/profile`, {
         method: "POST",
+        credentials: "include",
+        headers: {
+          ...(token ? { Authorization: `Bearer ${token}` } : {}),
+        },
         body: data,
       });
 
