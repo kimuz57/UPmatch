@@ -25,6 +25,10 @@ import {
   Copy,
   ExternalLink,
   Globe,
+  GraduationCap,
+  Ruler,
+  Brain,
+  Palette,
 } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { getApiBaseUrl, formatImageUrl } from "@/utils/api";
@@ -72,6 +76,7 @@ export default function ProfilePage() {
     caption: "",
     hobbies: "",
     mbti: "",
+    height: "",
   });
 
   const [photoSlots, setPhotoSlots] = useState(() => Array(9).fill(null));
@@ -176,6 +181,7 @@ export default function ProfilePage() {
           caption: p.caption || "",
           hobbies: p.hobbies || "",
           mbti: p.mbti || "",
+          height: p.height || "",
         });
       }
     } catch (error) {
@@ -221,6 +227,7 @@ export default function ProfilePage() {
       data.append("caption", editForm.caption);
       data.append("hobbies", editForm.hobbies);
       data.append("mbti", editForm.mbti);
+      data.append("height", String(editForm.height || 0));
 
       const res = await fetch(`${getApiBaseUrl()}/api/v1/profile`, {
         method: "POST",
@@ -506,13 +513,51 @@ export default function ProfilePage() {
 
             {profile.caption && (
               <p className="text-xs text-slate-600 mt-1 text-center max-w-xs font-normal">
-                "{profile.caption}"
+                &ldquo;{profile.caption}&rdquo;
               </p>
             )}
 
             <p className="text-xs text-purple-900 font-semibold bg-purple-100 px-3 py-0.5 rounded-full mt-2 border border-purple-200">
               ยืนยันอีเมล @up.ac.th แล้ว
             </p>
+
+            {/* Quick Profile Info Pills */}
+            <div className="flex flex-wrap justify-center gap-1.5 mt-3 max-w-sm">
+              {profile.faculty && profile.faculty !== "-" && (
+                <span className="flex items-center gap-1 text-[11px] font-semibold bg-purple-50 text-purple-900 border border-purple-200 px-2.5 py-1 rounded-full">
+                  <GraduationCap className="w-3 h-3 text-purple-700" />
+                  {profile.faculty}
+                </span>
+              )}
+              {profile.height && profile.height > 0 ? (
+                <span className="flex items-center gap-1 text-[11px] font-semibold bg-purple-50 text-purple-900 border border-purple-200 px-2.5 py-1 rounded-full">
+                  <Ruler className="w-3 h-3 text-purple-700" />
+                  {profile.height} ซม.
+                </span>
+              ) : null}
+              {profile.mbti && profile.mbti !== "-" && (
+                <span className="flex items-center gap-1 text-[11px] font-semibold bg-purple-50 text-purple-900 border border-purple-200 px-2.5 py-1 rounded-full">
+                  <Brain className="w-3 h-3 text-purple-700" />
+                  {profile.mbti}
+                </span>
+              )}
+              {profile.gender && (
+                <span className="flex items-center gap-1 text-[11px] font-semibold bg-slate-100 text-slate-700 border border-slate-200 px-2.5 py-1 rounded-full">
+                  เพศ {profile.gender}
+                </span>
+              )}
+            </div>
+
+            {/* Hobbies list */}
+            {profile.hobbies && profile.hobbies.trim() !== "" && (
+              <div className="flex flex-wrap justify-center gap-1 mt-2.5 max-w-xs">
+                {profile.hobbies.split(/[,，、]+/).map((h, i) => (
+                  <span key={i} className="text-[10px] bg-slate-50 border border-slate-200 text-slate-700 px-2 py-0.5 rounded-md font-medium">
+                    {h.trim()}
+                  </span>
+                ))}
+              </div>
+            )}
           </div>
         ) : (
           <div className="text-center py-10 text-slate-500 text-xs font-medium">
@@ -662,15 +707,27 @@ export default function ProfilePage() {
                 />
               </div>
 
-              <div>
-                <label className="block text-xs font-bold text-slate-700 mb-1">คณะ</label>
-                <input
-                  type="text"
-                  placeholder="เช่น ICT, วิศวกรรมศาสตร์, พยาบาลศาสตร์"
-                  value={editForm.faculty}
-                  onChange={(e) => setEditForm({ ...editForm, faculty: e.target.value })}
-                  className="w-full p-2.5 rounded-xl border border-slate-300 bg-white outline-none focus:border-purple-800 focus:ring-1 focus:ring-purple-800"
-                />
+              <div className="grid grid-cols-2 gap-3">
+                <div>
+                  <label className="block text-xs font-bold text-slate-700 mb-1">คณะ</label>
+                  <input
+                    type="text"
+                    placeholder="คณะ"
+                    value={editForm.faculty}
+                    onChange={(e) => setEditForm({ ...editForm, faculty: e.target.value })}
+                    className="w-full p-2.5 rounded-xl border border-slate-300 bg-white outline-none focus:border-purple-800 focus:ring-1 focus:ring-purple-800"
+                  />
+                </div>
+                <div>
+                  <label className="block text-xs font-bold text-slate-700 mb-1">ส่วนสูง (ซม.)</label>
+                  <input
+                    type="number"
+                    placeholder="ส่วนสูง (ซม.)"
+                    value={editForm.height}
+                    onChange={(e) => setEditForm({ ...editForm, height: e.target.value })}
+                    className="w-full p-2.5 rounded-xl border border-slate-300 bg-white outline-none focus:border-purple-800 focus:ring-1 focus:ring-purple-800"
+                  />
+                </div>
               </div>
 
               <div className="grid grid-cols-2 gap-3">
@@ -704,7 +761,7 @@ export default function ProfilePage() {
                 <label className="block text-xs font-bold text-slate-700 mb-1">แคปชั่นแนะนำตัว</label>
                 <input
                   type="text"
-                  placeholder="เช่น หาเพื่อนกินหมูกระทะ..."
+                  placeholder="แคปชั่นของคุณ"
                   value={editForm.caption}
                   onChange={(e) => setEditForm({ ...editForm, caption: e.target.value })}
                   className="w-full p-2.5 rounded-xl border border-slate-300 bg-white outline-none focus:border-purple-800 focus:ring-1 focus:ring-purple-800"
@@ -716,7 +773,7 @@ export default function ProfilePage() {
                   <label className="block text-xs font-bold text-slate-700 mb-1">งานอดิเรก</label>
                   <input
                     type="text"
-                    placeholder="เช่น ฟังเพลง, เล่นบอร์ดเกม"
+                    placeholder="งานอดิเรก"
                     value={editForm.hobbies}
                     onChange={(e) => setEditForm({ ...editForm, hobbies: e.target.value })}
                     className="w-full p-2.5 rounded-xl border border-slate-300 bg-white outline-none"
@@ -726,7 +783,7 @@ export default function ProfilePage() {
                   <label className="block text-xs font-bold text-slate-700 mb-1">MBTI</label>
                   <input
                     type="text"
-                    placeholder="เช่น INFP, ENFP"
+                    placeholder="MBTI"
                     value={editForm.mbti}
                     onChange={(e) => setEditForm({ ...editForm, mbti: e.target.value })}
                     className="w-full p-2.5 rounded-xl border border-slate-300 bg-white outline-none"

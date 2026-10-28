@@ -14,6 +14,7 @@ import {
   MapPin,
   Heart,
   MessageCircle,
+  Ruler,
 } from "lucide-react";
 
 export default function ProfileDetailModal({
@@ -187,7 +188,7 @@ export default function ProfileDetailModal({
               </div>
               {user.caption || user.bio ? (
                 <p className="text-xs sm:text-sm font-semibold text-slate-900 leading-relaxed">
-                  "{user.caption || user.bio}"
+                  &ldquo;{user.caption || user.bio}&rdquo;
                 </p>
               ) : (
                 <p className="text-xs text-slate-500 font-normal">
@@ -207,19 +208,32 @@ export default function ProfileDetailModal({
               </p>
             </div>
 
-            {/* MBTI */}
-            <div className="p-3.5 rounded-xl bg-slate-50 border border-slate-200">
-              <div className="flex items-center gap-1.5 text-slate-800 font-bold text-xs mb-1">
-                <Brain className="w-4 h-4 text-purple-800" />
-                <span>บุคลิกภาพ (MBTI)</span>
-              </div>
-              {user.mbti && user.mbti !== "-" ? (
-                <div className="inline-block px-2.5 py-0.5 rounded-md bg-purple-100 text-purple-900 border border-purple-200 font-bold text-xs">
-                  {user.mbti}
+            {/* Height & MBTI */}
+            <div className="grid grid-cols-2 gap-2 text-xs">
+              <div className="p-3.5 rounded-xl bg-slate-50 border border-slate-200">
+                <div className="flex items-center gap-1.5 text-slate-800 font-bold text-xs mb-1">
+                  <Ruler className="w-4 h-4 text-purple-800" />
+                  <span>ส่วนสูง</span>
                 </div>
-              ) : (
-                <p className="text-xs text-slate-500 font-normal">ไม่ได้ระบุ MBTI</p>
-              )}
+                {user.height && user.height > 0 ? (
+                  <p className="text-xs sm:text-sm font-semibold text-slate-900">{user.height} ซม.</p>
+                ) : (
+                  <p className="text-xs text-slate-500 font-normal">ไม่ได้ระบุ</p>
+                )}
+              </div>
+              <div className="p-3.5 rounded-xl bg-slate-50 border border-slate-200">
+                <div className="flex items-center gap-1.5 text-slate-800 font-bold text-xs mb-1">
+                  <Brain className="w-4 h-4 text-purple-800" />
+                  <span>บุคลิกภาพ (MBTI)</span>
+                </div>
+                {user.mbti && user.mbti !== "-" ? (
+                  <div className="inline-block px-2.5 py-0.5 rounded-md bg-purple-100 text-purple-900 border border-purple-200 font-bold text-xs">
+                    {user.mbti}
+                  </div>
+                ) : (
+                  <p className="text-xs text-slate-500 font-normal">ไม่ได้ระบุ</p>
+                )}
+              </div>
             </div>
 
             {/* Hobbies */}

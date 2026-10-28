@@ -49,6 +49,8 @@ func SaveProfile(c *fiber.Ctx) error {
 	hobbies := c.FormValue("hobbies")
 	mbti := c.FormValue("mbti")
 	faculty := c.FormValue("faculty") // เพิ่มรับค่าคณะ
+	heightStr := c.FormValue("height")
+	height, _ := strconv.Atoi(strings.TrimSpace(heightStr))
 
 	// แปลงวันเกิด
 	birthDate, _ := time.Parse("2006-01-02", birthDateStr)
@@ -70,6 +72,7 @@ func SaveProfile(c *fiber.Ctx) error {
 		Caption:    caption,
 		Hobbies:    hobbies,
 		MBTI:       mbti,
+		Height:     height,
 		BirthDate:  birthDate,
 		Gender:     gender,
 		Preference: preference,

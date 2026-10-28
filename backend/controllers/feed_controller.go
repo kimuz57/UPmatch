@@ -84,6 +84,7 @@ func getProfileByEmail(email string) profileRow {
 		p.Caption = info.Caption
 		p.Hobbies = info.Hobbies
 		p.MBTI = info.MBTI
+		p.Height = info.Height
 		p.Gender = info.Gender
 		p.Preference = info.Preference
 		p.Faculty = info.Faculty
@@ -296,6 +297,7 @@ func GetMe(c *fiber.Ctx) error {
 			"caption":    prof.Caption,
 			"hobbies":    prof.Hobbies,
 			"mbti":       prof.MBTI,
+			"height":     prof.Height,
 			"image":      imageURL,
 			"images":        allImages,
 			"email":         user.Email,
@@ -455,6 +457,7 @@ func GetFeed(c *fiber.Ctx) error {
 			"caption":        prof.Caption,
 			"hobbies":        prof.Hobbies,
 			"mbti":           prof.MBTI,
+			"height":         prof.Height,
 			"gender":         prof.Gender,
 			"preference":     prof.Preference,
 			"promptQuestion": "แคปชั่น / แนะนำตัว",
@@ -571,6 +574,7 @@ func GetUserProfile(c *fiber.Ctx) error {
 			"bio":        prof.Caption,
 			"hobbies":    prof.Hobbies,
 			"mbti":       prof.MBTI,
+			"height":     prof.Height,
 			"image":      firstImageURL(sortedImages),
 			"images":     allImages,
 		},

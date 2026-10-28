@@ -2,7 +2,7 @@
 "use client";
 
 import React, { useState, useEffect, useMemo, useRef } from "react";
-import { motion, AnimatePresence } from "framer-motion";
+import { motion, AnimatePresence, useMotionValue, useTransform } from "framer-motion";
 import {
   Heart,
   X,
@@ -19,11 +19,192 @@ import {
   Palette,
   Info,
   User,
+  Ruler,
 } from "lucide-react";
 import Navbar from "@/components/Navbar";
 import { useRouter } from "next/navigation";
 import { getApiBaseUrl, formatImageUrl } from "@/utils/api";
 import ProfileDetailModal from "@/components/ProfileDetailModal";
+
+function SwipeableCard({
+  card,
+  currentAge,
+  cardImages,
+  photoIndex,
+  activeImageUrl,
+  isDraggingRef,
+  handlePrevPhoto,
+  handleNextPhoto,
+  handleSwipe,
+  setShowProfileModal,
+  swipeDirection,
+}) {
+  const x = useMotionValue(0);
+  const rotate = useTransform(x, [-250, 0, 250], [-18, 0, 18]);
+  const likeOpacity = useTransform(x, [25, 110], [0, 1]);
+  const nopeOpacity = useTransform(x, [-25, -110], [0, 1]);
+
+  return (
+    <motion.div
+      key={card.id}
+      custom={swipeDirection}
+      variants={{
+        enter: { scale: 0.95, y: 10, opacity: 0 },
+        center: { scale: 1, y: 0, opacity: 1, x: 0, rotate: 0 },
+        exit: (dir) => ({
+          x: dir === "right" ? 500 : -500,
+          rotate: dir === "right" ? 22 : -22,
+          opacity: 0,
+          transition: { duration: 0.32, ease: [0.32, 0.72, 0, 1] },
+        }),
+      }}
+      initial="enter"
+      animate="center"
+      exit="exit"
+      style={{ x, rotate }}
+      drag="x"
+      dragConstraints={{ left: 0, right: 0 }}
+      dragElastic={0.85}
+      onDragStart={() => {
+        isDraggingRef.current = true;
+      }}
+      onDragEnd={(_, info) => {
+        setTimeout(() => {
+          isDraggingRef.current = false;
+        }, 150);
+        if (info.offset.x > 90 || info.velocity.x > 400) {
+          handleSwipe(card, "right");
+        } else if (info.offset.x < -90 || info.velocity.x < -400) {
+          handleSwipe(card, "left");
+        }
+      }}
+      className="absolute inset-0 w-full h-full rounded-2xl overflow-hidden shadow-lg border border-slate-200 bg-slate-900 flex flex-col justify-end cursor-grab active:cursor-grabbing select-none z-20 group"
+    >
+      {/* LIKE Badge (Green) when dragged right */}
+      <motion.div
+        style={{ opacity: likeOpacity }}
+        className="absolute top-6 left-6 z-30 border-4 border-emerald-400 bg-emerald-500/25 text-emerald-400 font-black text-2xl sm:text-3xl px-3.5 py-1 rounded-xl rotate-[-15deg] pointer-events-none drop-shadow-md tracking-wider uppercase select-none"
+      >
+        LIKE
+      </motion.div>
+
+      {/* NOPE Badge (Red) when dragged left */}
+      <motion.div
+        style={{ opacity: nopeOpacity }}
+        className="absolute top-6 right-6 z-30 border-4 border-rose-500 bg-rose-500/25 text-rose-500 font-black text-2xl sm:text-3xl px-3.5 py-1 rounded-xl rotate-[15deg] pointer-events-none drop-shadow-md tracking-wider uppercase select-none"
+      >
+        PASS
+      </motion.div>
+
+      {/* Profile Image */}
+      <div className="absolute inset-0 pointer-events-none">
+        <img
+          key={activeImageUrl}
+          src={formatImageUrl(activeImageUrl)}
+          alt={card.name}
+          className="w-full h-full object-cover transition-opacity duration-200 select-none pointer-events-none"
+        />
+        <div className="absolute inset-0 bg-gradient-to-t from-slate-950/90 via-slate-950/25 to-transparent pointer-events-none" />
+      </div>
+
+      {/* Left/Right Tap Zones for photo flip */}
+      {cardImages.length > 1 && (
+        <div className="absolute inset-0 z-10 flex select-none">
+          <div
+            className="w-1/2 h-full cursor-pointer flex items-center justify-start pl-2.5 active:bg-black/5"
+            onClick={(e) => {
+              e.stopPropagation();
+              if (isDraggingRef.current) return;
+              handlePrevPhoto();
+            }}
+            title="แตะซีกซ้ายเพื่อดูรูปก่อนหน้า"
+          >
+            <div className="w-7 h-7 rounded-full bg-black/40 text-white opacity-0 group-hover:opacity-80 transition flex items-center justify-center pointer-events-none">
+              <ChevronLeft className="w-4 h-4" />
+            </div>
+          </div>
+
+          <div
+            className="w-1/2 h-full cursor-pointer flex items-center justify-end pr-2.5 active:bg-black/5"
+            onClick={(e) => {
+              e.stopPropagation();
+              if (isDraggingRef.current) return;
+              handleNextPhoto();
+            }}
+            title="แตะซีกขวาเพื่อดูรูปถัดไป"
+          >
+            <div className="w-7 h-7 rounded-full bg-black/40 text-white opacity-0 group-hover:opacity-80 transition flex items-center justify-center pointer-events-none">
+              <ChevronRight className="w-4 h-4" />
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Profile Info Button */}
+      <button
+        type="button"
+        onClick={(e) => {
+          e.stopPropagation();
+          setShowProfileModal(true);
+        }}
+        title="ดูโปรไฟล์เต็ม"
+        className="absolute top-3.5 right-3.5 z-20 w-8 h-8 rounded-full bg-black/50 hover:bg-black/70 text-white flex items-center justify-center transition cursor-pointer"
+      >
+        <Info className="w-4 h-4" />
+      </button>
+
+      {/* Card Text Info */}
+      <div
+        onClick={(e) => {
+          e.stopPropagation();
+          setShowProfileModal(true);
+        }}
+        className="relative z-20 p-4 sm:p-5 pb-6 text-white space-y-1 cursor-pointer hover:opacity-95 transition group"
+        title="แตะเพื่อดูโปรไฟล์เต็ม"
+      >
+        <div className="flex items-center gap-2">
+          <h2 className="text-xl sm:text-2xl font-black drop-shadow-sm">
+            {card.name}{currentAge ? `, ${currentAge}` : ""}
+          </h2>
+          {card.height && card.height > 0 && (
+            <span className="text-[10px] bg-white/20 backdrop-blur-xs text-white font-bold px-2 py-0.5 rounded-full">
+              {card.height} ซม.
+            </span>
+          )}
+          <span className="text-[10px] bg-white text-purple-950 font-bold px-2 py-0.5 rounded-full shadow-xs">
+            ดูโปรไฟล์
+          </span>
+        </div>
+        {card.faculty && card.faculty.trim() !== "-" && (
+          <p className="text-xs text-purple-200 font-semibold flex items-center gap-1 drop-shadow-xs">
+            <GraduationCap className="w-3.5 h-3.5 sm:w-4 sm:h-4" /> <span>{card.faculty}</span>
+          </p>
+        )}
+        {(card.bio || card.caption) && (
+          <p className="text-xs text-slate-200 leading-snug line-clamp-2 pt-0.5 font-normal">
+            {card.bio || card.caption}
+          </p>
+        )}
+      </div>
+
+      {/* Photo Dots Indicator */}
+      {cardImages.length > 1 && (
+        <div className="absolute bottom-2 left-1/2 -translate-x-1/2 z-20 flex items-center gap-1 px-2.5 py-1 rounded-full bg-black/50 pointer-events-none shadow-xs">
+          {cardImages.map((_, idx) => (
+            <span
+              key={idx}
+              className={`transition-all duration-200 rounded-full ${
+                idx === photoIndex
+                  ? "w-3.5 h-1.5 bg-white"
+                  : "w-1.5 h-1.5 bg-white/40"
+              }`}
+            />
+          ))}
+        </div>
+      )}
+    </motion.div>
+  );
+}
 
 const getProfileAge = (card) => {
   if (card?.age && card.age > 0) return card.age;
@@ -216,10 +397,12 @@ export default function SwipePage() {
   }, [router]);
 
   const [photoIndex, setPhotoIndex] = useState(0);
+  const [swipeDirection, setSwipeDirection] = useState("right");
   const isDraggingRef = useRef(false);
 
   const deck = profiles.filter((p) => !swipedIds.includes(p.id));
   const currentCard = deck[0] || null;
+  const nextCard = deck[1] || null;
   const currentAge = getProfileAge(currentCard);
 
   useEffect(() => {
@@ -257,6 +440,7 @@ export default function SwipePage() {
 
   const handleSwipe = async (card, direction) => {
     if (!card) return;
+    setSwipeDirection(direction);
     setSwipedIds((prev) => [...prev, card.id]);
     
     const email = getCookie("upmatch_email");
@@ -333,129 +517,40 @@ export default function SwipePage() {
           {/* Card Swipe Column: Left (Col 7) */}
           <div className="lg:col-span-7 flex flex-col items-center w-full justify-center">
             <div className="relative w-full max-w-[320px] sm:max-w-xs aspect-[3/4] flex items-center justify-center">
-              <AnimatePresence>
+              {/* Card Stack: Next Card Behind */}
+              {nextCard && (
+                <div className="absolute inset-0 w-full h-full rounded-2xl overflow-hidden shadow-sm border border-slate-200 bg-slate-900 scale-[0.95] translate-y-3 opacity-75 pointer-events-none select-none transition-all duration-300 z-10">
+                  <img
+                    src={formatImageUrl(
+                      (Array.isArray(nextCard.images) && nextCard.images[0]) || nextCard.image || "/placeholder.jpg"
+                    )}
+                    alt={nextCard.name}
+                    className="w-full h-full object-cover"
+                  />
+                  <div className="absolute inset-0 bg-gradient-to-t from-slate-950/90 via-slate-950/25 to-transparent pointer-events-none" />
+                  <div className="absolute bottom-6 left-5 right-5 text-white pointer-events-none">
+                    <h3 className="text-xl font-black drop-shadow-sm">{nextCard.name}</h3>
+                    {nextCard.faculty && <p className="text-xs text-purple-200 font-semibold">{nextCard.faculty}</p>}
+                  </div>
+                </div>
+              )}
+
+              <AnimatePresence custom={swipeDirection}>
                 {currentCard ? (
-                  <motion.div
+                  <SwipeableCard
                     key={currentCard.id}
-                    drag="x"
-                    dragConstraints={{ left: 0, right: 0 }}
-                    onDragStart={() => {
-                      isDraggingRef.current = true;
-                    }}
-                    onDragEnd={(_, info) => {
-                      setTimeout(() => {
-                        isDraggingRef.current = false;
-                      }, 150);
-                      if (info.offset.x > 100) handleSwipe(currentCard, "right");
-                      else if (info.offset.x < -100) handleSwipe(currentCard, "left");
-                    }}
-                    initial={{ scale: 0.96, opacity: 0 }}
-                    animate={{ scale: 1, opacity: 1 }}
-                    exit={{ opacity: 0, scale: 0.94 }}
-                    className="w-full h-full rounded-2xl overflow-hidden shadow-md relative flex flex-col justify-end cursor-grab active:cursor-grabbing border border-slate-200 bg-slate-900 group select-none"
-                  >
-                    {/* Profile Image */}
-                    <div className="absolute inset-0">
-                      <img
-                        key={activeImageUrl}
-                        src={formatImageUrl(activeImageUrl)}
-                        alt={currentCard.name}
-                        className="w-full h-full object-cover transition-opacity duration-200 select-none pointer-events-none"
-                      />
-                      <div className="absolute inset-0 bg-gradient-to-t from-slate-950/90 via-slate-950/25 to-transparent pointer-events-none" />
-                    </div>
-
-                    {/* Left/Right Tap Zones for photo flip */}
-                    {cardImages.length > 1 && (
-                      <div className="absolute inset-0 z-10 flex select-none">
-                        <div
-                          className="w-1/2 h-full cursor-pointer flex items-center justify-start pl-2.5 active:bg-black/5"
-                          onClick={(e) => {
-                            e.stopPropagation();
-                            if (isDraggingRef.current) return;
-                            handlePrevPhoto();
-                          }}
-                          title="แตะซีกซ้ายเพื่อดูรูปก่อนหน้า"
-                        >
-                          <div className="w-7 h-7 rounded-full bg-black/40 text-white opacity-0 group-hover:opacity-80 transition flex items-center justify-center pointer-events-none">
-                            <ChevronLeft className="w-4 h-4" />
-                          </div>
-                        </div>
-
-                        <div
-                          className="w-1/2 h-full cursor-pointer flex items-center justify-end pr-2.5 active:bg-black/5"
-                          onClick={(e) => {
-                            e.stopPropagation();
-                            if (isDraggingRef.current) return;
-                            handleNextPhoto();
-                          }}
-                          title="แตะซีกขวาเพื่อดูรูปถัดไป"
-                        >
-                          <div className="w-7 h-7 rounded-full bg-black/40 text-white opacity-0 group-hover:opacity-80 transition flex items-center justify-center pointer-events-none">
-                            <ChevronRight className="w-4 h-4" />
-                          </div>
-                        </div>
-                      </div>
-                    )}
-
-                    {/* Profile Info Button */}
-                    <button
-                      type="button"
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        setShowProfileModal(true);
-                      }}
-                      title="ดูโปรไฟล์เต็ม"
-                      className="absolute top-3.5 right-3.5 z-20 w-8 h-8 rounded-full bg-black/50 hover:bg-black/70 text-white flex items-center justify-center transition cursor-pointer"
-                    >
-                      <Info className="w-4 h-4" />
-                    </button>
-
-                    {/* Card Text Info */}
-                    <div
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        setShowProfileModal(true);
-                      }}
-                      className="relative z-20 p-4 sm:p-5 pb-6 text-white space-y-1 cursor-pointer hover:opacity-95 transition group"
-                      title="แตะเพื่อดูโปรไฟล์เต็ม"
-                    >
-                      <div className="flex items-center gap-2">
-                        <h2 className="text-xl sm:text-2xl font-black drop-shadow-sm">
-                          {currentCard.name}{currentAge ? `, ${currentAge}` : ""}
-                        </h2>
-                        <span className="text-[10px] bg-white text-purple-950 font-bold px-2 py-0.5 rounded-full shadow-xs">
-                          ดูโปรไฟล์
-                        </span>
-                      </div>
-                      {currentCard.faculty && currentCard.faculty.trim() !== "-" && (
-                        <p className="text-xs text-purple-200 font-semibold flex items-center gap-1 drop-shadow-xs">
-                          <GraduationCap className="w-3.5 h-3.5 sm:w-4 sm:h-4" /> <span>{currentCard.faculty}</span>
-                        </p>
-                      )}
-                      {(currentCard.bio || currentCard.caption) && (
-                        <p className="text-xs text-slate-200 leading-snug line-clamp-2 pt-0.5 font-normal">
-                          {currentCard.bio || currentCard.caption}
-                        </p>
-                      )}
-                    </div>
-
-                    {/* Photo Dots Indicator */}
-                    {cardImages.length > 1 && (
-                      <div className="absolute bottom-2 left-1/2 -translate-x-1/2 z-20 flex items-center gap-1 px-2.5 py-1 rounded-full bg-black/50 pointer-events-none shadow-xs">
-                        {cardImages.map((_, idx) => (
-                          <span
-                            key={idx}
-                            className={`transition-all duration-200 rounded-full ${
-                              idx === photoIndex
-                                ? "w-3.5 h-1.5 bg-white"
-                                : "w-1.5 h-1.5 bg-white/40"
-                            }`}
-                          />
-                        ))}
-                      </div>
-                    )}
-                  </motion.div>
+                    card={currentCard}
+                    currentAge={currentAge}
+                    cardImages={cardImages}
+                    photoIndex={photoIndex}
+                    activeImageUrl={activeImageUrl}
+                    isDraggingRef={isDraggingRef}
+                    handlePrevPhoto={handlePrevPhoto}
+                    handleNextPhoto={handleNextPhoto}
+                    handleSwipe={handleSwipe}
+                    setShowProfileModal={setShowProfileModal}
+                    swipeDirection={swipeDirection}
+                  />
                 ) : (
                   <div className="w-full h-full rounded-2xl bg-white border border-slate-200 p-6 flex flex-col items-center justify-center text-center space-y-3 shadow-xs">
                     <Users className="w-8 h-8 text-purple-800" />
@@ -540,7 +635,7 @@ export default function SwipePage() {
                   <div className="p-3.5 rounded-xl bg-slate-50 border border-slate-200">
                     <p className="text-[10px] font-bold text-purple-800 mb-0.5">แนะนำตัว</p>
                     <p className="text-xs font-semibold text-slate-900 leading-relaxed">
-                      "{currentCard.caption || currentCard.bio}"
+                      &ldquo;{currentCard.caption || currentCard.bio}&rdquo;
                     </p>
                   </div>
                 )}
@@ -555,6 +650,21 @@ export default function SwipePage() {
                       <p className="text-[10px] font-bold text-slate-500">คณะที่ศึกษา</p>
                       <p className="text-xs font-bold text-slate-900 truncate">{currentCard.faculty}</p>
                     </div>
+                  </div>
+                )}
+
+                {/* Height */}
+                {currentCard.height && currentCard.height > 0 && (
+                  <div className="p-3 rounded-xl bg-slate-50 border border-slate-200 flex items-center justify-between">
+                    <div className="flex items-center gap-2">
+                      <span className="p-1.5 rounded-lg bg-purple-100 text-purple-900">
+                        <Ruler className="w-4 h-4" />
+                      </span>
+                      <span className="text-xs font-bold text-slate-800">ส่วนสูง</span>
+                    </div>
+                    <span className="px-2.5 py-1 rounded-md bg-purple-100 text-purple-900 border border-purple-200 font-bold text-xs">
+                      {currentCard.height} ซม.
+                    </span>
                   </div>
                 )}
 
